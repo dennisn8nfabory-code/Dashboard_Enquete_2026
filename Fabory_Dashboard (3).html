@@ -1,0 +1,2147 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FABORY – Inside Sales Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#003087;--red-dark:#002060;--red-light:#E8F2FA;
+  --black:#111;--gray-700:#444;--gray-500:#777;--gray-300:#ccc;--gray-100:#f4f4f4;
+  --white:#fff;--border:#e0e0e0;--radius:6px;--shadow:0 2px 12px rgba(0,0,0,.08);
+  --green:#2e7d32;--green-light:#e8f5e9;--orange:#e65100;--orange-light:#fff8e1;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#f0f0ef;color:var(--black);min-height:100vh}
+.site-header{background:#003087;display:flex;align-items:stretch}
+.header-content{display:flex;align-items:stretch;flex:1;padding:0}
+.fabory-logo-full{font-family:'DM Sans',sans-serif;font-size:26px;font-weight:700;color:white;letter-spacing:1px}
+
+.header-div{width:1px;height:28px;background:rgba(255,255,255,.3)}
+.header-sub{color:rgba(255,255,255,.8);font-size:12px;font-weight:400;letter-spacing:.5px;text-transform:uppercase}
+.header-badge{margin-left:auto;background:rgba(200,16,46,.2);border:1px solid var(--red);color:#ff6b6b;padding:3px 11px;border-radius:20px;font-size:11px;font-weight:500}
+.filter-bar{background:var(--white);border-bottom:1px solid var(--border);padding:12px 32px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.filter-label{font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px}
+.team-btn{border:1.5px solid var(--border);background:var(--white);color:var(--gray-700);padding:5px 14px;border-radius:20px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .15s;font-weight:500}
+.team-btn:hover{border-color:var(--red);color:var(--red)}
+.team-btn.active{background:var(--red);border-color:var(--red);color:var(--white)}
+.tabs-bar{background:var(--white);border-bottom:1px solid var(--border);padding:0 32px;display:flex;gap:0}
+.tab-btn{padding:12px 18px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--gray-500);cursor:pointer;border-bottom:3px solid transparent;transition:all .15s;white-space:nowrap}
+.tab-btn:hover{color:var(--black)}
+.tab-btn.active{color:var(--red);border-bottom-color:var(--red)}
+.main-wrap{max-width:1100px;margin:0 auto;padding:28px 16px 80px}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.empty-state{text-align:center;padding:72px 32px;color:var(--gray-500)}
+.empty-state .es-icon{font-size:44px;margin-bottom:14px}
+.empty-state h3{font-family:'DM Serif Display',serif;font-size:20px;color:var(--black);margin-bottom:7px}
+.empty-state p{font-size:13px;line-height:1.6}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px}
+.kpi-tile{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+.kpi-tile .kpi-label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--gray-500);font-weight:600;margin-bottom:7px}
+.kpi-tile .kpi-value{font-family:'DM Serif Display',serif;font-size:30px;color:var(--black);line-height:1}
+.kpi-tile .kpi-sub{font-size:11px;color:var(--gray-500);margin-top:3px}
+.kpi-tile.red{border-top:3px solid var(--red)}
+.kpi-tile.orange{border-top:3px solid #ff9800}
+.kpi-tile.green{border-top:3px solid var(--green)}
+.dash-section{margin-bottom:24px}
+.dash-section-title{font-family:'DM Serif Display',serif;font-size:17px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.dash-section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.heatmap-wrap{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow-x:auto}
+.heatmap-table{width:100%;border-collapse:collapse;font-size:11px}
+.heatmap-table th{padding:8px 7px;text-align:center;font-weight:600;font-size:10px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.3px;border-bottom:2px solid var(--border);white-space:nowrap}
+.heatmap-table th.name-col{text-align:left;padding-left:14px;min-width:130px}
+.heatmap-table th.cat-h{background:var(--black);color:var(--white)}
+.heatmap-table td{padding:7px;text-align:center;border-bottom:1px solid var(--gray-100)}
+.heatmap-table td.name-cell{text-align:left;padding-left:14px;font-weight:500;font-size:12px;white-space:nowrap}
+.heatmap-table tr:last-child td{border-bottom:none}
+.heatmap-table tr:hover td{background:rgba(200,16,46,.03)}
+.score-cell{width:32px;height:26px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-weight:600;font-size:11px}
+.score-1{background:#fde8ec;color:#9e0c23}.score-2{background:#ffe0cc;color:#c04a00}
+.score-3{background:#fff9c4;color:#7a6600}.score-4{background:#dcedc8;color:#33691e}
+.score-5{background:#b9f6ca;color:#1b5e20}.score-0{background:var(--gray-100);color:var(--gray-300)}
+.avg-row td{background:#f9f9f9!important;font-weight:600}
+/* 360 STYLES */
+.subtab-btn{padding:10px 18px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--gray-500);cursor:pointer;border-bottom:3px solid transparent;transition:all .15s}
+.subtab-btn:hover{color:var(--black)}
+.subtab-btn.active{color:var(--red);border-bottom-color:var(--red);font-weight:600}
+.cat-360-header{background:var(--black);color:var(--white);padding:11px 16px;display:flex;align-items:center;gap:8px;border-radius:var(--radius) var(--radius) 0 0;margin-top:14px}
+.cat-360-title{font-family:'DM Serif Display',serif;font-size:15px;font-weight:normal}
+.sub-360-row{display:grid;grid-template-columns:180px 1fr 1fr 80px;align-items:center;gap:0;border-bottom:1px solid var(--gray-100);background:var(--white)}
+.sub-360-row:nth-child(even){background:var(--gray-100)}
+.sub-360-row:hover{background:rgba(200,16,46,.03)}
+.sub-360-label{padding:10px 14px;font-size:12px;font-weight:600;color:var(--black)}
+.sub-360-self{padding:8px 14px;display:flex;align-items:center;gap:6px}
+.sub-360-sup{padding:8px 14px;display:flex;align-items:center;gap:6px}
+.sub-360-gap{padding:8px 14px;text-align:center}
+.ref-stars{display:flex;gap:2px}
+.ref-star{font-size:15px;color:var(--gray-300)}
+.ref-star.filled{color:#cccccc}
+.sup-stars{display:flex;gap:2px}
+.sup-star-btn{background:none;border:none;font-size:18px;cursor:pointer;color:var(--gray-300);padding:1px;line-height:1;transition:transform .1s}
+.sup-star-btn:hover{transform:scale(1.15)}
+.sup-star-btn.active{color:#f5a623}
+.gap-badge{display:inline-flex;align-items:center;justify-content:center;width:32px;height:22px;border-radius:4px;font-size:11px;font-weight:700}
+.gap-pos{background:#e8f5e9;color:#2e7d32}
+.gap-neg{background:#fdeaed;color:var(--red-dark)}
+.gap-zero{background:var(--gray-100);color:var(--gray-500)}
+.col-header-360{padding:6px 14px;font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px;background:var(--gray-100);border-bottom:1px solid var(--border)}
+/* Vergelijk table */
+.vergelijk-table{width:100%;border-collapse:collapse;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.vergelijk-table th{background:var(--black);color:var(--white);padding:10px 14px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;text-align:center}
+.vergelijk-table th.left{text-align:left}
+.vergelijk-table td{padding:9px 14px;border-bottom:1px solid var(--gray-100);font-size:12px;text-align:center}
+.vergelijk-table td.name-col{text-align:left;font-weight:600}
+.vergelijk-table td.cat-col{background:var(--gray-100);font-weight:700;font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px}
+.vergelijk-table tr:last-child td{border-bottom:none}
+.gap-pos-cell{background:#e8f5e9;color:#2e7d32;font-weight:700}
+.gap-neg-cell{background:#fdeaed;color:var(--red-dark);font-weight:700}
+.gap-zero-cell{background:var(--gray-100);color:var(--gray-500)}
+.top-list{display:flex;flex-direction:column;gap:8px}
+.top-item{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px 16px;display:flex;align-items:center;gap:12px}
+.top-rank{font-family:'DM Serif Display',serif;font-size:20px;color:var(--gray-300);min-width:28px}
+.top-rank.gold{color:#f5a623}.top-rank.silver{color:#999}.top-rank.bronze{color:#cd7f32}
+.top-info{flex:1}
+.top-name{font-weight:600;font-size:13px}
+.top-cat{font-size:10px;color:var(--gray-500);margin-top:1px}
+.top-bar-bg{background:var(--gray-100);border-radius:3px;height:7px;overflow:hidden;flex:1}
+.top-bar-fill{height:100%;background:var(--red);border-radius:3px;transition:width .5s ease}
+.top-count{font-size:12px;font-weight:600;color:var(--red);min-width:32px;text-align:right}
+.urg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.urg-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;text-align:center}
+.urg-card .urg-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:7px}
+.urg-card .urg-value{font-family:'DM Serif Display',serif;font-size:34px}
+.urg-card .urg-pct{font-size:11px;color:var(--gray-500)}
+.urg-card.high{border-top:3px solid var(--red)}.urg-card.high .urg-label{color:var(--red)}
+.urg-card.med{border-top:3px solid #ff9800}.urg-card.med .urg-label{color:var(--orange)}
+.urg-card.low{border-top:3px solid var(--green)}.urg-card.low .urg-label{color:var(--green)}
+.plan-table{width:100%;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);border-collapse:collapse;overflow:hidden}
+.plan-table th{background:var(--black);color:var(--white);padding:11px 14px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.plan-table td{padding:10px 14px;border-bottom:1px solid var(--gray-100);font-size:12px}
+.plan-table tr:last-child td{border-bottom:none}
+.plan-table tr:hover td{background:var(--gray-100)}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+.badge.hoog{background:var(--red-light);color:var(--red-dark)}.badge.middel{background:var(--orange-light);color:var(--orange)}
+.badge.laag{background:var(--green-light);color:var(--green)}.badge.klassikaal{background:#e3f2fd;color:#0d47a1}
+.badge.online{background:#f3e5f5;color:#4a148c}.badge.beide{background:var(--gray-100);color:var(--gray-700)}
+.persoon-select{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 22px;margin-bottom:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.persoon-select label{font-size:12px;font-weight:600;color:var(--gray-700)}
+.persoon-select select{border:1.5px solid var(--border);border-radius:var(--radius);padding:7px 12px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--black);background:var(--white)}
+.persoon-select select:focus{outline:none;border-color:var(--red)}
+.btn-export{border:1.5px solid var(--border);background:var(--white);color:var(--gray-700);padding:8px 16px;border-radius:var(--radius);font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.btn-export:hover{border-color:var(--black);color:var(--black)}
+.btn-export.primary{background:var(--red);border-color:var(--red);color:var(--white)}
+.btn-export.primary:hover{background:var(--red-dark)}
+.export-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.persoon-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.persoon-header{background:var(--black);color:var(--white);padding:18px 22px;display:flex;align-items:center;gap:14px}
+.persoon-avatar{width:42px;height:42px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:17px;color:white;flex-shrink:0}
+.persoon-name{font-family:'DM Serif Display',serif;font-size:17px}
+.persoon-meta{font-size:11px;color:#aaa;margin-top:2px}
+.persoon-body{padding:20px}
+.persoon-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px;margin-bottom:16px}
+.psi{border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px}
+.psi-cat{font-size:10px;color:var(--gray-500);font-weight:600;text-transform:uppercase;margin-bottom:3px}
+.psi-name{font-size:12px;font-weight:500;margin-bottom:5px}
+.psi-stars{color:#f5a623;font-size:13px}
+.psi-num{font-size:10px;color:var(--gray-500)}
+.psi-beh span{font-size:9px;background:var(--gray-100);padding:2px 5px;border-radius:8px;color:var(--gray-700);display:inline-block;margin:2px 2px 0 0}
+.opm-row{background:var(--gray-100);border-radius:var(--radius);padding:8px 12px;margin-top:4px;font-size:11px;color:var(--gray-700);font-style:italic}
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:white;font-size:14px}
+.loading-overlay.visible{display:flex}
+.spinner{width:34px;height:34px;border:3px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* ── WACHTWOORDSCHERM ── */
+#loginOverlay{position:fixed;inset:0;background:#003087;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity .4s,transform .4s}
+#loginOverlay.hide{opacity:0;pointer-events:none;transform:translateY(-30px)}
+.login-box{background:#fff;border-radius:10px;padding:40px 44px;width:340px;box-shadow:0 8px 40px rgba(0,0,0,.25);text-align:center}
+.login-logo{font-family:'DM Serif Display',serif;font-size:28px;font-weight:700;color:#003087;margin-bottom:4px;letter-spacing:.5px}
+.login-sub{font-size:12px;color:#777;margin-bottom:28px;font-family:'DM Sans',sans-serif}
+.login-input{width:100%;padding:11px 14px;border:1.5px solid #e0e0e0;border-radius:6px;font-size:14px;font-family:'DM Sans',sans-serif;box-sizing:border-box;margin-bottom:14px;outline:none;transition:border-color .2s}
+.login-input:focus{border-color:#003087}
+.login-btn{width:100%;padding:12px;background:#003087;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .2s}
+.login-btn:hover{background:#002060}
+.login-error{color:#c8102e;font-size:12px;font-family:'DM Sans',sans-serif;margin-top:8px;min-height:16px;font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.login-box.shake{animation:shake .35s ease}
+/* ── VOORTGANG ── */
+.vg-team-card{background:#fff;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,.07);margin-bottom:16px;overflow:hidden}
+.vg-team-hdr{background:#003087;color:#fff;padding:12px 18px;display:flex;align-items:center;justify-content:space-between}
+.vg-team-name{font-size:14px;font-weight:700;font-family:'DM Serif Display',serif}
+.vg-team-count{font-size:12px;color:rgba(255,255,255,.8)}
+.vg-progress-bar{height:6px;background:#e8eef6}
+.vg-progress-fill{height:100%;background:#f5a623;transition:width .6s}
+.vg-names-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px;padding:14px 18px}
+.vg-name-item{display:flex;align-items:center;gap:7px;font-size:12px;font-family:'DM Sans',sans-serif;padding:5px 8px;border-radius:4px}
+.vg-name-item.done{background:#f0fff4;color:#1b5e20}
+.vg-name-item.todo{background:#fff8f8;color:#999}
+.vg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.vg-dot.done{background:#4caf50}
+.vg-dot.todo{background:#ddd}
+.vg-summary-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+.vg-kpi{background:#fff;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,.07);padding:18px;text-align:center}
+.vg-kpi-val{font-size:30px;font-weight:700;margin-bottom:3px}
+.vg-kpi-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#777}
+.refresh-btn{margin-left:auto;background:none;border:1px solid #444;color:#aaa;padding:5px 12px;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;transition:all .15s}
+.refresh-btn:hover{border-color:#aaa;color:white}
+.team-tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;background:#e3f2fd;color:#0d47a1}
+
+/* DRAG & DROP */
+.drop-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:24px;text-align:center;color:var(--gray-500);font-size:13px;cursor:pointer;transition:all .2s;background:var(--white)}
+.drop-zone:hover,.drop-zone.dragover{border-color:#003087;background:#f0f4ff;color:#003087}
+.drop-zone .dz-icon{font-size:28px;margin-bottom:8px}
+.drop-zone input[type=file]{display:none}
+.drop-zone-label{font-weight:600;font-size:13px;color:#003087;cursor:pointer}
+.drop-zone-sub{font-size:11px;color:var(--gray-500);margin-top:4px}
+.import-status{font-size:12px;color:#2e7d32;font-weight:600;margin-top:8px;min-height:18px}
+
+/* 360 ANALYSIS */
+.dash-section-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px}
+.dash-section-tab{padding:10px 20px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--gray-500);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s}
+.dash-section-tab:hover{color:var(--black)}
+.dash-section-tab.active{color:#003087;border-bottom-color:#003087;font-weight:700}
+.analysis-360-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.kpi-360{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 16px;text-align:center}
+.kpi-360 .kv{font-size:28px;font-weight:700;margin-bottom:4px}
+.kpi-360 .kl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--gray-500)}
+.kpi-360 .ks{font-size:11px;color:var(--gray-500);margin-top:3px}
+.gap-table{width:100%;border-collapse:collapse;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.gap-table th{background:#111;color:white;padding:9px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;text-align:left}
+.gap-table td{padding:8px 12px;border-bottom:1px solid var(--gray-100);font-size:12px}
+.gap-table tr:last-child td{border-bottom:none}
+.gap-table tr:nth-child(even) td{background:#fafafa}
+.gap-pos{background:#e8f5e9;color:#2e7d32;font-weight:700;border-radius:3px;padding:2px 6px}
+.gap-neg{background:#fdeaed;color:#c8102e;font-weight:700;border-radius:3px;padding:2px 6px}
+.gap-zero{background:#f4f4f4;color:#777;border-radius:3px;padding:2px 6px}
+
+/* ── NIEUWE NAVIGATIE ── */
+.filter-bar{background:#fff;border-bottom:1px solid var(--border);padding:8px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:48px}
+.filter-label{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.4px;margin-right:4px}
+.team-btn{padding:5px 13px;border:1.5px solid var(--border);border-radius:20px;background:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:#666;cursor:pointer;transition:all .15s}
+.team-btn:hover{border-color:#003087;color:#003087}
+.team-btn.active{background:#003087;border-color:#003087;color:#fff;font-weight:600}
+.import-modal-btn{padding:6px 14px;border:1.5px solid #003087;border-radius:4px;background:#fff;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#003087;cursor:pointer;transition:all .15s;white-space:nowrap}
+.import-modal-btn:hover{background:#003087;color:#fff}
+.section-bar{background:#fff;border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center}
+.section-btn{padding:12px 20px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:#888;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s}
+.section-btn:hover{color:#003087}
+.section-btn.active{color:#003087;border-bottom-color:#003087;font-weight:700}
+.subtabs-bar{background:#fff;border-bottom:1px solid var(--border);padding:6px 16px;display:flex;align-items:center;gap:4px}
+.tab-btn{padding:7px 14px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:#888;cursor:pointer;border-radius:4px;transition:all .15s}
+.tab-btn:hover{background:#f0f4ff;color:#003087}
+.tab-btn.active{background:#003087;color:#fff;font-weight:600}
+/* ── MODALS ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.visible{display:flex}
+.modal-box{background:#fff;border-radius:8px;padding:28px;width:460px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:16px;color:#003087;display:flex;align-items:center;gap:8px}
+.modal-close{margin-left:auto;border:none;background:none;font-size:22px;cursor:pointer;color:#888;line-height:1;padding:0}
+.modal-close:hover{color:#111}
+.modal-drop-zone{border:2px dashed #003087;border-radius:6px;padding:28px;text-align:center;cursor:pointer;background:#f8fafd;transition:all .2s}
+.modal-drop-zone:hover,.modal-drop-zone.dragover{background:#e8f2fa}
+
+
+/* ── 360 FORMULIER ── */
+.s360-setup-card{background:#fff;border-radius:6px;box-shadow:0 2px 12px rgba(0,0,0,.08);padding:20px;margin-bottom:12px}
+.s360-card{background:#fff;border-radius:6px;box-shadow:0 2px 12px rgba(0,0,0,.08);overflow:hidden;margin-bottom:12px}
+.s360-cat-hdr{padding:10px 16px;display:flex;align-items:center;gap:8px;color:#fff;font-size:14px;font-weight:600}
+.s360-row{display:flex;align-items:center;padding:9px 16px;border-bottom:1px solid #f0f0f0;gap:8px}
+.s360-row:last-child{border-bottom:none}
+.s360-row:nth-child(even){background:#fafafa}
+.s360-label{flex:1;font-size:12px;color:#333;font-weight:500}
+.s360-self{font-size:10px;white-space:nowrap;min-width:50px;text-align:right}
+.s360-stars{display:flex;gap:2px}
+.s360-star{background:none;border:none;font-size:19px;cursor:pointer;color:#ddd;padding:1px;line-height:1;transition:color .1s}
+.s360-star.active{color:#f5a623}
+.s360-field-label{font-size:10px;font-weight:700;color:#777;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px}
+.s360-select,.s360-input{width:100%;padding:8px 10px;border:1.5px solid #e0e0e0;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:13px}
+.s360-submit-btn{background:#003087;color:#fff;border:none;padding:12px 36px;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s}
+.s360-submit-btn:hover{background:#002060}
+.s360-submit-btn:disabled{background:#ccc;cursor:not-allowed}
+/* gap table */
+.gap-tbl{width:100%;border-collapse:collapse;background:#fff;border-radius:6px;box-shadow:0 2px 12px rgba(0,0,0,.08);overflow:hidden;margin-bottom:16px}
+.gap-tbl th{background:#111;color:#fff;padding:9px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;text-align:left}
+.gap-tbl td{padding:8px 12px;border-bottom:1px solid #f0f0f0;font-size:12px}
+.gap-tbl tr:last-child td{border-bottom:none}
+.gap-pos{background:#e8f5e9;color:#2e7d32;font-weight:700;border-radius:3px;padding:2px 6px}
+.gap-neg{background:#fdeaed;color:#c8102e;font-weight:700;border-radius:3px;padding:2px 6px}
+.gap-zero{background:#f4f4f4;color:#777;border-radius:3px;padding:2px 6px}
+.kpi360-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px}
+.kpi360{background:#fff;border-radius:6px;box-shadow:0 2px 12px rgba(0,0,0,.08);padding:16px;text-align:center}
+.kpi360-val{font-size:26px;font-weight:700;margin-bottom:2px}
+.kpi360-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#777}
+.kpi360-sub{font-size:11px;color:#999;margin-top:2px}
+
+</style>
+</head>
+<body>
+
+<!-- LOGIN OVERLAY -->
+<div id="loginOverlay">
+  <div class="login-box" id="loginBox">
+    <div class="login-logo">FABORY</div>
+    <div class="login-sub">Inside Sales · Analyse Dashboard 2026</div>
+    <input type="password" id="loginPwd" class="login-input" placeholder="Wachtwoord" onkeydown="if(event.key==='Enter')checkLogin()">
+    <button class="login-btn" onclick="checkLogin()">Inloggen</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><div id="loadingMsg">Resultaten laden…</div></div>
+
+<header class="site-header">
+  <div class="header-content">
+    <div class="header-logo-zone" style="background:white;padding:10px 20px;display:flex;align-items:center;align-self:stretch">
+      <img src="data:image/png;base64,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" alt="FABORY" style="height:26px;display:block">
+    </div>
+    <div style="width:1px;height:28px;background:rgba(255,255,255,.3);margin:0 16px;align-self:center"></div>
+    <div class="header-sub" style="align-self:center">Inside Sales · Analyse Dashboard</div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:10px;padding:0 16px;align-self:center">
+      <div class="header-badge" id="respondentBadge">0 respondenten</div>
+      <button class="refresh-btn" onclick="loadData()">↺ Vernieuwen</button>
+    </div>
+  </div>
+</header>
+
+<!-- TEAM FILTER -->
+<div class="filter-bar" style="display:flex;align-items:center;flex-wrap:wrap">
+  <span class="filter-label">TEAM:</span>
+  <button class="team-btn active" data-team="Alle teams" onclick="setTeam(this)">Alle teams</button>
+  <button class="team-btn" data-team="Noord Oost NL" onclick="setTeam(this)">Noord Oost NL</button>
+  <button class="team-btn" data-team="West NL" onclick="setTeam(this)">West NL</button>
+  <button class="team-btn" data-team="Zuid NL" onclick="setTeam(this)">Zuid NL</button>
+  <button class="team-btn" data-team="National Accounts" onclick="setTeam(this)">National Accounts</button>
+  <button class="team-btn" data-team="Petro" onclick="setTeam(this)">Petro</button>
+  <div style="margin-left:auto;display:flex;gap:8px">
+    <button class="import-modal-btn" onclick="document.getElementById('modal360').classList.add('visible')">🔄 360° import</button>
+  </div>
+</div>
+
+
+<!-- IMPORT MODALS -->
+<div class="modal-overlay" id="modalEnquete" onclick="if(event.target===this)this.classList.remove('visible')">
+  <div class="modal-box">
+    <div class="modal-title">📥 Enquête CSV importeren
+      <button class="modal-close" onclick="document.getElementById('modalEnquete').classList.remove('visible')">×</button>
+    </div>
+    <div class="modal-drop-zone"
+      ondragover="event.preventDefault();this.classList.add('dragover')"
+      ondragleave="this.classList.remove('dragover')"
+      ondrop="event.preventDefault();this.classList.remove('dragover');handleFiles(event.dataTransfer.files,'enquete')">
+      <input type="file" id="fileInputEnquete" accept=".csv" multiple style="display:none" onchange="handleFiles(this.files,'enquete')">
+      <div style="font-size:32px;margin-bottom:8px">📥</div>
+      <label for="fileInputEnquete" style="font-weight:600;color:#003087;cursor:pointer;font-size:13px">Sleep CSV bestanden hierheen of klik om te selecteren</label>
+      <div style="font-size:11px;color:#888;margin-top:4px">Meerdere bestanden tegelijk mogelijk</div>
+    </div>
+    <div id="modalEnqueteStatus" style="font-size:12px;color:#2e7d32;font-weight:600;margin-top:10px;text-align:center;min-height:18px"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal360" onclick="if(event.target===this)this.classList.remove('visible')">
+  <div class="modal-box">
+    <div class="modal-title">🔄 360° CSV importeren
+      <button class="modal-close" onclick="document.getElementById('modal360').classList.remove('visible')">×</button>
+    </div>
+    <div class="modal-drop-zone"
+      ondragover="event.preventDefault();this.classList.add('dragover')"
+      ondragleave="this.classList.remove('dragover')"
+      ondrop="event.preventDefault();this.classList.remove('dragover');handleFiles(event.dataTransfer.files,'360')">
+      <input type="file" id="fileInput360" accept=".csv" multiple style="display:none" onchange="handleFiles(this.files,'360')">
+      <div style="font-size:32px;margin-bottom:8px">🔄</div>
+      <label for="fileInput360" style="font-weight:600;color:#003087;cursor:pointer;font-size:13px">Sleep 360° CSV bestanden hierheen of klik om te selecteren</label>
+      <div style="font-size:11px;color:#888;margin-top:4px">Supervisor-beoordelingen</div>
+    </div>
+    <div id="modal360Status" style="font-size:12px;color:#2e7d32;font-weight:600;margin-top:10px;text-align:center;min-height:18px"></div>
+  </div>
+</div>
+
+
+<div class="section-bar" style="position:relative">
+  <button class="section-btn active" id="dsTab-eigen" onclick="switchDashSection('eigen',this)">📊 Eigen Beoordeling</button>
+  <button class="section-btn" id="dsTab-360" onclick="switchDashSection('360',this)">🔄 360° Analyse</button>
+  <button class="section-btn" id="dsTab-voortgang" onclick="switchDashSection('voortgang',this)">📈 Voortgang</button>
+</div>
+<div class="subtabs-bar" id="eigenTabs">
+  <button class="tab-btn active" onclick="switchTab('overzicht',this)">📊 Overzicht</button>
+  <button class="tab-btn" onclick="switchTab('heatmap',this)">🌡️ Heatmap</button>
+  <button class="tab-btn" onclick="switchTab('training',this)">🎯 Trainingen</button>
+  <button class="tab-btn" onclick="switchTab('planning',this)">📋 Planning</button>
+  <button class="tab-btn" onclick="switchTab('persoon',this)">👤 Per Persoon</button>
+</div>
+<div class="subtabs-bar" id="tabs360" style="display:none">
+  <button class="tab-btn active" id="tab360-invullen" onclick="switch360Tab('invullen',this)">✏️ Beoordeling invullen</button>
+  <button class="tab-btn" id="tab360-collectief" onclick="switch360Tab('collectief',this)">📊 Gap-analyse collectief</button>
+  <button class="tab-btn" id="tab360-persoon" onclick="switch360Tab('persoon',this)">👤 Gap-analyse per persoon</button>
+</div>
+
+<div id="main-content-wrap"><div class="main-wrap">
+
+  <!-- OVERZICHT -->
+  <div class="tab-content active" id="tab-overzicht">
+    <div id="overzicht-empty" class="empty-state"><div class="es-icon">📊</div><h3>Nog geen resultaten</h3><p>Zodra medewerkers de enquête invullen verschijnen de resultaten hier automatisch.<br>Klik op ↺ Vernieuwen om te controleren.</p></div>
+    <div id="overzicht-content" style="display:none">
+      <div class="export-bar">
+        <button class="btn-export primary" onclick="exportExcel()">⬇ Export naar Excel</button>
+      </div>
+      <div class="kpi-grid" id="kpiGrid"></div>
+      <div class="dash-section"><div class="dash-section-title">Gemiddelde beheersing per categorie</div><div id="catAvgGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px"></div></div>
+      <div class="dash-section"><div class="dash-section-title">Verdeling urgentie</div><div class="urg-grid" id="urgGrid"></div></div>
+      <div class="dash-section"><div class="dash-section-title">Voorkeur trainingsvorm</div><div id="vormGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px"></div></div>
+    </div>
+  </div>
+
+  <!-- HEATMAP -->
+  <div class="tab-content" id="tab-heatmap">
+    <div id="heatmap-empty" class="empty-state"><div class="es-icon">🌡️</div><h3>Nog geen resultaten</h3><p>Wacht tot medewerkers de enquête hebben ingevuld.</p></div>
+    <div id="heatmap-content" style="display:none">
+      <div class="heatmap-wrap"><table class="heatmap-table" id="heatmapTable"></table></div>
+      <p style="font-size:10px;color:var(--gray-500);margin-top:6px;text-align:right">🔴 1 onvoldoende → 🟡 3 voldoende → 🟢 5 zeer goed</p>
+    </div>
+  </div>
+
+  <!-- TRAINING -->
+  <div class="tab-content" id="tab-training">
+    <div id="training-empty" class="empty-state"><div class="es-icon">🎯</div><h3>Nog geen resultaten</h3><p>Wacht tot medewerkers de enquête hebben ingevuld.</p></div>
+    <div id="training-content" style="display:none">
+      <div class="dash-section"><div class="dash-section-title">Top trainingsonderwerpen</div><div class="top-list" id="topList"></div></div>
+      <div class="dash-section" style="margin-top:24px"><div class="dash-section-title">Gemelde knelpunten</div><div id="knelpuntenList" style="background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden"></div></div>
+    </div>
+  </div>
+
+  <!-- PLANNING -->
+  <div class="tab-content" id="tab-planning">
+    <div id="planning-empty" class="empty-state"><div class="es-icon">📋</div><h3>Nog geen resultaten</h3><p>Wacht tot medewerkers de enquête hebben ingevuld.</p></div>
+    <div id="planning-content" style="display:none">
+      <div class="export-bar"><button class="btn-export primary" onclick="exportPlanning()">⬇ Export Planning</button></div>
+      <table class="plan-table">
+        <thead><tr><th>#</th><th>Onderwerp</th><th>Categorie</th><th>Deelnemers</th><th>Gem. score</th><th>Urgentie</th><th>Vorm</th><th>Advies</th></tr></thead>
+        <tbody id="planningBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PER PERSOON -->
+  <div class="tab-content" id="tab-persoon">
+    <div id="persoon-empty" class="empty-state"><div class="es-icon">👤</div><h3>Nog geen resultaten</h3><p>Wacht tot medewerkers de enquête hebben ingevuld.</p></div>
+    <div id="persoon-content" style="display:none">
+      <div class="persoon-select">
+        <label>Medewerker:</label>
+        <select id="persoonSelect" onchange="renderPersoon()"></select>
+        <button class="btn-export primary" onclick="openPDF()">📄 PDF Dossier</button>
+        <button class="btn-export" onclick="exportPersoonCSV()">⬇ CSV</button>
+      </div>
+      <div id="persoonDetail"></div>
+    </div>
+  </div>
+
+  <!-- 360 TAB -->
+  <div class="tab-content" id="tab-driehonderdzestig">
+    <div id="360-empty" class="empty-state"><div class="es-icon">🔄</div><h3>Nog geen medewerkerdata</h3><p>Laad eerst enquête-resultaten via het Import-tabblad.</p></div>
+    <div id="360-content" style="display:none">
+      <!-- 360 IMPORT BAR -->
+      <div id="360-import-bar" style="background:#fff8e1;border:1.5px solid #ff9800;border-radius:var(--radius);padding:11px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <span style="font-size:12px;color:#555;font-weight:500">📥 360-CSV bestanden laden:</span>
+        <input type="file" accept=".csv" multiple
+          onchange="load360CSV(this.files); this.value=''"
+          style="font-size:12px;cursor:pointer">
+        <span id="360-import-status" style="font-size:11px;color:#2e7d32;font-weight:600"></span>
+      </div>
+      <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px">
+        <button class="subtab-btn active" id="subtab-invullen" onclick="switch360('invullen',this)">✏️ Invullen</button>
+        <button class="subtab-btn" id="subtab-vergelijk" onclick="switch360('vergelijk',this)">📊 Vergelijk & Gap-analyse</button>
+      </div>
+
+      <!-- INVULLEN -->
+      <div id="pane-invullen">
+        <div style="background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 24px;margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <label style="font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px">Supervisor</label>
+            <input type="text" id="sup-naam" placeholder="Naam supervisor" style="border:1.5px solid var(--border);border-radius:var(--radius);padding:8px 12px;font-size:13px;font-family:'DM Sans',sans-serif;width:200px">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <label style="font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px">Teamlid beoordelen <span style="color:var(--red)">*</span></label>
+            <select id="sup-teamlid" onchange="renderInvulForm()" style="border:1.5px solid var(--border);border-radius:var(--radius);padding:8px 12px;font-size:13px;font-family:'DM Sans',sans-serif;min-width:220px">
+              <option value="">— Selecteer teamlid —</option>
+            </select>
+          </div>
+          <div style="margin-left:auto">
+            <button class="btn-export primary" onclick="save360()">💾 Opslaan & Download CSV</button>
+          </div>
+        </div>
+        <div id="invul-reference" style="display:none;background:var(--gray-100);border-radius:var(--radius);padding:10px 16px;margin-bottom:14px;font-size:12px;color:var(--gray-700);border-left:3px solid var(--gray-300)">
+          <strong>Referentie:</strong> grijze scores zijn de zelfbeoordeling van de medewerker.
+        </div>
+        <div id="invul-form"></div>
+      </div>
+
+      <!-- VERGELIJK -->
+      <div id="pane-vergelijk" style="display:none">
+        <div style="background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 22px;margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <label style="font-size:12px;font-weight:600;color:var(--gray-700)">Medewerker:</label>
+          <select id="vergelijk-select-old" onchange="renderVergelijkOld()" style="border:1.5px solid var(--border);border-radius:var(--radius);padding:7px 12px;font-size:13px;font-family:'DM Sans',sans-serif">
+            <option value="">— Selecteer —</option>
+          </select>
+          <button class="btn-export primary" onclick="export360PDF()" style="margin-left:auto">📄 360° PDF Dossier</button>
+          <button class="btn-export" onclick="export360CSV()">⬇ CSV</button>
+        </div>
+        <div style="display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gray-700)"><span style="width:12px;height:12px;border-radius:2px;background:#e8f5e9;border:1px solid #4caf50;display:inline-block"></span>Positief — Supervisor hoger (onderschatting)</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gray-700)"><span style="width:12px;height:12px;border-radius:2px;background:#fdeaed;border:1px solid var(--red);display:inline-block"></span>Negatief — Medewerker hoger (overschatting)</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gray-700)"><span style="width:12px;height:12px;border-radius:2px;background:var(--gray-100);border:1px solid var(--gray-300);display:inline-block"></span>Geen gap</div>
+        </div>
+        <div id="vergelijk-content-old"></div>
+      </div>
+    </div>
+  </div>
+
+</div></div>
+
+<div id="wrap-360-analysis" style="display:none">
+<div id="tab-360-invullen" style="padding:20px;max-width:860px;margin:0 auto">
+
+  <!-- 360 beoordelingen worden opgeslagen in N8N/NocoDB -->
+  <div class="s360-setup-card">
+    <h3 style="font-size:14px;font-weight:700;color:#003087;margin-bottom:14px">Selecteer teamlid om te beoordelen</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      <div><label class="s360-field-label">Teamlid</label>
+        <select id="sel360Teamlid" onchange="load360SelfScores()" class="s360-select"><option value="">-- Selecteer teamlid --</option></select></div>
+      <div><label class="s360-field-label">Jouw naam (supervisor)</label>
+        <input type="text" id="sup360Naam" placeholder="Volledige naam" class="s360-input"></div>
+      <div><label class="s360-field-label">Jouw e-mail</label>
+        <input type="email" id="sup360Email" placeholder="naam@fabory.com" class="s360-input"></div>
+    </div>
+    <p style="font-size:11px;color:#888;margin-top:10px">💡 Zelfscore van teamlid als referentie: 🔴 laag, 🟠 middel, 🟢 hoog. Positieve gap = onderschatting.</p>
+  </div>
+  <div id="form360Fields" style="display:none"><div class="s360-card"><div class="s360-cat-hdr" style="background:#003087"><span>🏆</span><span>Masters in Fasteners</span></div><div class="s360-row"><span class="s360-label">Productkennis Fasteners</span><span class="s360-self" id="s360ref-mif_productkennis_f"></span><div class="s360-stars" id="s360-mif_productkennis_f"><button class="s360-star" data-val="1" data-sub="mif_productkennis_f" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="mif_productkennis_f" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="mif_productkennis_f" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="mif_productkennis_f" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="mif_productkennis_f" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Productkennis Non-Fasteners</span><span class="s360-self" id="s360ref-mif_productkennis_nf"></span><div class="s360-stars" id="s360-mif_productkennis_nf"><button class="s360-star" data-val="1" data-sub="mif_productkennis_nf" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="mif_productkennis_nf" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="mif_productkennis_nf" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="mif_productkennis_nf" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="mif_productkennis_nf" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Marktkennis</span><span class="s360-self" id="s360ref-mif_marktkennis"></span><div class="s360-stars" id="s360-mif_marktkennis"><button class="s360-star" data-val="1" data-sub="mif_marktkennis" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="mif_marktkennis" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="mif_marktkennis" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="mif_marktkennis" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="mif_marktkennis" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Prijsopbouw</span><span class="s360-self" id="s360ref-mif_prijsopbouw"></span><div class="s360-stars" id="s360-mif_prijsopbouw"><button class="s360-star" data-val="1" data-sub="mif_prijsopbouw" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="mif_prijsopbouw" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="mif_prijsopbouw" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="mif_prijsopbouw" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="mif_prijsopbouw" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Differentiatie OEM & MRO</span><span class="s360-self" id="s360ref-mif_oem_mro"></span><div class="s360-stars" id="s360-mif_oem_mro"><button class="s360-star" data-val="1" data-sub="mif_oem_mro" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="mif_oem_mro" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="mif_oem_mro" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="mif_oem_mro" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="mif_oem_mro" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Service Selector</span><span class="s360-self" id="s360ref-mif_service"></span><div class="s360-stars" id="s360-mif_service"><button class="s360-star" data-val="1" data-sub="mif_service" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="mif_service" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="mif_service" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="mif_service" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="mif_service" onclick="set360Star(this)">★</button></div></div></div><div class="s360-card"><div class="s360-cat-hdr" style="background:#003366"><span>🗄️</span><span>SAP — totaalscore per onderdeel</span></div><div class="s360-row"><span class="s360-label">Orders</span><span class="s360-self" id="s360ref-sap_orders"></span><div class="s360-stars" id="s360-sap_orders"><button class="s360-star" data-val="1" data-sub="sap_orders" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="sap_orders" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="sap_orders" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="sap_orders" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="sap_orders" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Quotations</span><span class="s360-self" id="s360ref-sap_quotations"></span><div class="s360-stars" id="s360-sap_quotations"><button class="s360-star" data-val="1" data-sub="sap_quotations" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="sap_quotations" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="sap_quotations" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="sap_quotations" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="sap_quotations" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Inquiries</span><span class="s360-self" id="s360ref-sap_inquiries"></span><div class="s360-stars" id="s360-sap_inquiries"><button class="s360-star" data-val="1" data-sub="sap_inquiries" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="sap_inquiries" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="sap_inquiries" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="sap_inquiries" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="sap_inquiries" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Customer Info</span><span class="s360-self" id="s360ref-sap_customer_info"></span><div class="s360-stars" id="s360-sap_customer_info"><button class="s360-star" data-val="1" data-sub="sap_customer_info" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="sap_customer_info" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="sap_customer_info" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="sap_customer_info" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="sap_customer_info" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Article Info</span><span class="s360-self" id="s360ref-sap_article_info"></span><div class="s360-stars" id="s360-sap_article_info"><button class="s360-star" data-val="1" data-sub="sap_article_info" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="sap_article_info" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="sap_article_info" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="sap_article_info" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="sap_article_info" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Cust Management</span><span class="s360-self" id="s360ref-sap_cust_mgmt"></span><div class="s360-stars" id="s360-sap_cust_mgmt"><button class="s360-star" data-val="1" data-sub="sap_cust_mgmt" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="sap_cust_mgmt" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="sap_cust_mgmt" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="sap_cust_mgmt" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="sap_cust_mgmt" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Logic</span><span class="s360-self" id="s360ref-sap_logic"></span><div class="s360-stars" id="s360-sap_logic"><button class="s360-star" data-val="1" data-sub="sap_logic" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="sap_logic" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="sap_logic" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="sap_logic" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="sap_logic" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Contract Reservations</span><span class="s360-self" id="s360ref-sap_contracts"></span><div class="s360-stars" id="s360-sap_contracts"><button class="s360-star" data-val="1" data-sub="sap_contracts" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="sap_contracts" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="sap_contracts" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="sap_contracts" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="sap_contracts" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Quality Notifications</span><span class="s360-self" id="s360ref-sap_quality"></span><div class="s360-stars" id="s360-sap_quality"><button class="s360-star" data-val="1" data-sub="sap_quality" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="sap_quality" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="sap_quality" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="sap_quality" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="sap_quality" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Invoicing</span><span class="s360-self" id="s360ref-sap_invoicing"></span><div class="s360-stars" id="s360-sap_invoicing"><button class="s360-star" data-val="1" data-sub="sap_invoicing" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="sap_invoicing" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="sap_invoicing" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="sap_invoicing" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="sap_invoicing" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Purchase</span><span class="s360-self" id="s360ref-sap_purchase"></span><div class="s360-stars" id="s360-sap_purchase"><button class="s360-star" data-val="1" data-sub="sap_purchase" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="sap_purchase" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="sap_purchase" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="sap_purchase" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="sap_purchase" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Pricing</span><span class="s360-self" id="s360ref-sap_pricing"></span><div class="s360-stars" id="s360-sap_pricing"><button class="s360-star" data-val="1" data-sub="sap_pricing" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="sap_pricing" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="sap_pricing" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="sap_pricing" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="sap_pricing" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">TSC Logistics</span><span class="s360-self" id="s360ref-sap_tsc_logistics"></span><div class="s360-stars" id="s360-sap_tsc_logistics"><button class="s360-star" data-val="1" data-sub="sap_tsc_logistics" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="sap_tsc_logistics" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="sap_tsc_logistics" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="sap_tsc_logistics" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="sap_tsc_logistics" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">TSC Inventory</span><span class="s360-self" id="s360ref-sap_tsc_inventory"></span><div class="s360-stars" id="s360-sap_tsc_inventory"><button class="s360-star" data-val="1" data-sub="sap_tsc_inventory" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="sap_tsc_inventory" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="sap_tsc_inventory" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="sap_tsc_inventory" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="sap_tsc_inventory" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Queries</span><span class="s360-self" id="s360ref-sap_queries"></span><div class="s360-stars" id="s360-sap_queries"><button class="s360-star" data-val="1" data-sub="sap_queries" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="sap_queries" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="sap_queries" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="sap_queries" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="sap_queries" onclick="set360Star(this)">★</button></div></div></div><div class="s360-card"><div class="s360-cat-hdr" style="background:#0a3a6e"><span>💬</span><span>C4C</span></div><div class="s360-row"><span class="s360-label">Algemeen</span><span class="s360-self" id="s360ref-c4c_algemeen"></span><div class="s360-stars" id="s360-c4c_algemeen"><button class="s360-star" data-val="1" data-sub="c4c_algemeen" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="c4c_algemeen" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="c4c_algemeen" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="c4c_algemeen" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="c4c_algemeen" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Ticketafhandeling</span><span class="s360-self" id="s360ref-c4c_tickets"></span><div class="s360-stars" id="s360-c4c_tickets"><button class="s360-star" data-val="1" data-sub="c4c_tickets" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="c4c_tickets" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="c4c_tickets" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="c4c_tickets" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="c4c_tickets" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">(Automated) Tasks</span><span class="s360-self" id="s360ref-c4c_tasks"></span><div class="s360-stars" id="s360-c4c_tasks"><button class="s360-star" data-val="1" data-sub="c4c_tasks" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="c4c_tasks" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="c4c_tasks" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="c4c_tasks" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="c4c_tasks" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Opportunity & Contactregistratie</span><span class="s360-self" id="s360ref-c4c_opportunity"></span><div class="s360-stars" id="s360-c4c_opportunity"><button class="s360-star" data-val="1" data-sub="c4c_opportunity" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="c4c_opportunity" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="c4c_opportunity" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="c4c_opportunity" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="c4c_opportunity" onclick="set360Star(this)">★</button></div></div></div><div class="s360-card"><div class="s360-cat-hdr" style="background:#1b4d2e"><span>⚙️</span><span>Processen</span></div><div class="s360-row"><span class="s360-label">Local Sourcing</span><span class="s360-self" id="s360ref-proc_local"></span><div class="s360-stars" id="s360-proc_local"><button class="s360-star" data-val="1" data-sub="proc_local" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="proc_local" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="proc_local" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="proc_local" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="proc_local" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Pricing</span><span class="s360-self" id="s360ref-proc_pricing"></span><div class="s360-stars" id="s360-proc_pricing"><button class="s360-star" data-val="1" data-sub="proc_pricing" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="proc_pricing" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="proc_pricing" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="proc_pricing" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="proc_pricing" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Logic (CMI & VMI)</span><span class="s360-self" id="s360ref-proc_logic"></span><div class="s360-stars" id="s360-proc_logic"><button class="s360-star" data-val="1" data-sub="proc_logic" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="proc_logic" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="proc_logic" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="proc_logic" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="proc_logic" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Sales & Samenwerking</span><span class="s360-self" id="s360ref-proc_sales"></span><div class="s360-stars" id="s360-proc_sales"><button class="s360-star" data-val="1" data-sub="proc_sales" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="proc_sales" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="proc_sales" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="proc_sales" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="proc_sales" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Creditmanagement</span><span class="s360-self" id="s360ref-proc_creditmanagement"></span><div class="s360-stars" id="s360-proc_creditmanagement"><button class="s360-star" data-val="1" data-sub="proc_creditmanagement" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="proc_creditmanagement" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="proc_creditmanagement" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="proc_creditmanagement" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="proc_creditmanagement" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Operations (CWT & IOS)</span><span class="s360-self" id="s360ref-proc_operations"></span><div class="s360-stars" id="s360-proc_operations"><button class="s360-star" data-val="1" data-sub="proc_operations" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="proc_operations" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="proc_operations" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="proc_operations" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="proc_operations" onclick="set360Star(this)">★</button></div></div></div><div class="s360-card"><div class="s360-cat-hdr" style="background:#003070"><span>🌐</span><span>Digital</span></div><div class="s360-row"><span class="s360-label">Webservices</span><span class="s360-self" id="s360ref-dig_webservices"></span><div class="s360-stars" id="s360-dig_webservices"><button class="s360-star" data-val="1" data-sub="dig_webservices" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="dig_webservices" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="dig_webservices" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="dig_webservices" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="dig_webservices" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">E-procurement</span><span class="s360-self" id="s360ref-dig_eprocure"></span><div class="s360-stars" id="s360-dig_eprocure"><button class="s360-star" data-val="1" data-sub="dig_eprocure" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="dig_eprocure" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="dig_eprocure" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="dig_eprocure" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="dig_eprocure" onclick="set360Star(this)">★</button></div></div><div class="s360-row"><span class="s360-label">Microsoft 365</span><span class="s360-self" id="s360ref-dig_m365"></span><div class="s360-stars" id="s360-dig_m365"><button class="s360-star" data-val="1" data-sub="dig_m365" onclick="set360Star(this)">★</button><button class="s360-star" data-val="2" data-sub="dig_m365" onclick="set360Star(this)">★</button><button class="s360-star" data-val="3" data-sub="dig_m365" onclick="set360Star(this)">★</button><button class="s360-star" data-val="4" data-sub="dig_m365" onclick="set360Star(this)">★</button><button class="s360-star" data-val="5" data-sub="dig_m365" onclick="set360Star(this)">★</button></div></div></div>
+    <div class="s360-setup-card">
+      <label class="s360-field-label">Algemene opmerking (optioneel)</label>
+      <textarea id="sup360Opmerking" rows="3" placeholder="Aanvullende toelichting..." class="s360-input" style="resize:vertical"></textarea>
+    </div>
+    <div style="text-align:center;padding:20px 0">
+      <button class="s360-submit-btn" onclick="submit360()">💾 Beoordeling opslaan</button>
+      <div id="form360Status" style="margin-top:10px;font-size:12px;color:#2e7d32;font-weight:600;min-height:18px"></div>
+    </div>
+  </div>
+</div>
+
+<div id="tab-360-collectief" style="padding:20px;display:none">
+  <div style="text-align:right;margin-bottom:12px">
+    <button onclick="export360CSV()" style="padding:7px 16px;border:1.5px solid #003087;border-radius:4px;background:#fff;color:#003087;font-size:12px;font-weight:600;cursor:pointer">⬇ Export 360 CSV</button>
+  </div>
+  <div id="analyse360Content">
+    <div style="text-align:center;padding:60px;color:#777">
+      <div style="font-size:40px;margin-bottom:12px">📊</div>
+      <h3 style="font-size:16px">Nog geen 360-beoordelingen</h3>
+      <p style="margin-top:8px;font-size:13px">Vul eerst beoordelingen in via "Beoordeling invullen".</p>
+    </div>
+  </div>
+</div>
+<div id="tab-360-persoon" style="padding:20px;display:none">
+  <div class="s360-setup-card" style="margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div>
+        <label class="s360-field-label">Selecteer medewerker</label>
+        <select id="vergelijk-select" onchange="renderVergelijk()" class="s360-select" style="min-width:240px">
+          <option value="">-- Selecteer medewerker --</option>
+        </select>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px">
+        <button onclick="export360CSV()" style="padding:7px 16px;border:1.5px solid #003087;border-radius:4px;background:#fff;color:#003087;font-size:12px;font-weight:600;cursor:pointer">⬇ Export CSV</button>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap;font-size:12px;color:#555">
+    <div style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:2px;background:#e8f5e9;border:1px solid #4caf50;display:inline-block"></span>Positief — Supervisor hoger (onderschatting)</div>
+    <div style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:2px;background:#fdeaed;border:1px solid #c8102e;display:inline-block"></span>Negatief — Medewerker hoger (overschatting)</div>
+    <div style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:2px;background:#f4f4f4;border:1px solid #ccc;display:inline-block"></span>Geen gap</div>
+  </div>
+  <div id="vergelijk-content"></div>
+</div>
+
+</div>
+
+<!-- VOORTGANG -->
+<div id="wrap-voortgang" style="display:none;padding:20px">
+  <div class="vg-summary-row" id="vg-kpi-row"></div>
+  <div id="vg-team-cards"></div>
+</div>
+
+<script>
+// ── DATA DEFINITIONS ──────────────────────────────────────────────
+const CATEGORIES = [
+  {id:'mif',      label:'Masters in Fasteners', icon:'🏆', subs:[
+    {id:'mif_productkennis_f',  label:'Productkennis Fasteners'},
+    {id:'mif_productkennis_nf', label:'Productkennis Non-Fasteners'},
+    {id:'mif_marktkennis',      label:'Marktkennis'},
+    {id:'mif_prijsopbouw',      label:'Prijsopbouw'},
+    {id:'mif_oem_mro',          label:'Differentiatie OEM & MRO'},
+    {id:'mif_service',          label:'Service Selector'},
+  ]},
+  {id:'sap',      label:'SAP',                  icon:'🗄️', subs:[
+    {id:'sap_orders',           label:'Orders'},
+    {id:'sap_quotations',       label:'Quotations'},
+    {id:'sap_inquiries',        label:'Inquiries'},
+    {id:'sap_customer_info',    label:'Customer Info'},
+    {id:'sap_article_info',     label:'Article Info'},
+    {id:'sap_cust_mgmt',        label:'Cust Management'},
+    {id:'sap_logic',            label:'Logic'},
+    {id:'sap_contracts',        label:'Contract Reservations'},
+    {id:'sap_quality',          label:'Quality Notifications'},
+    {id:'sap_invoicing',        label:'Invoicing'},
+    {id:'sap_purchase',         label:'Purchase'},
+    {id:'sap_pricing',          label:'Pricing'},
+    {id:'sap_tsc_logistics',    label:'TSC Logistics'},
+    {id:'sap_tsc_inventory',    label:'TSC Inventory'},
+    {id:'sap_queries',          label:'Queries'},
+  ]},
+  {id:'c4c',      label:'C4C',                  icon:'💬', subs:[
+    {id:'c4c_algemeen',         label:'Algemeen'},
+    {id:'c4c_tickets',          label:'Ticketafhandeling'},
+    {id:'c4c_tasks',            label:'(Automated) Tasks'},
+    {id:'c4c_opportunity',      label:'Opportunity & Contactreg.'},
+  ]},
+  {id:'processen',label:'Processen',             icon:'⚙️', subs:[
+    {id:'proc_local',            label:'Local Sourcing'},
+    {id:'proc_pricing',          label:'Pricing'},
+    {id:'proc_logic',            label:'Logic (CMI & VMI)'},
+    {id:'proc_sales',            label:'Sales & Samenwerking'},
+    {id:'proc_creditmanagement', label:'Creditmanagement'},
+    {id:'proc_operations',       label:'Operations (CWT & IOS)'},
+  ]},
+  {id:'digital',  label:'Digital',               icon:'🌐', subs:[
+    {id:'dig_webservices',       label:'Webservices'},
+    {id:'dig_eprocure',          label:'E-procurement'},
+    {id:'dig_m365',              label:'Microsoft 365'},
+  ]},
+];
+const ALL_SUBS = CATEGORIES.flatMap(c=>c.subs.map(s=>({...s,cat:c.label,catIcon:c.icon})));
+const STAR_LABELS=['','Onvoldoende','Beperkt','Voldoende','Goed','Zeer goed'];
+const TEAMS=['Noord Oost NL','West NL','Zuid NL','National Accounts','Petro'];
+
+let allData    = [];   // all respondents
+let filtered   = [];   // after team filter
+let activeTeam = 'Alle teams';
+let activeTab  = 'overzicht';
+
+// ── CONFIGURATIE ─────────────────────────────────────────────────
+const SHAREPOINT_SITE = 'https://fabory.sharepoint.com/sites/NLSalesSMEVAS';
+
+// ── N8N CONFIGURATIE ──────────────────────────────────────────────
+const N8N_POST_URL = 'https://fab-n8n-dev-app-hsh6g7htbzcyajgs.westeurope-01.azurewebsites.net/webhook/fabory-enquete-opslaan';
+const N8N_GET_URL  = 'https://fab-n8n-dev-app-hsh6g7htbzcyajgs.westeurope-01.azurewebsites.net/webhook/fabory-enquete-ophalen-v2';
+const N8N_360_POST_URL = 'https://fab-n8n-dev-app-hsh6g7htbzcyajgs.westeurope-01.azurewebsites.net/webhook/fabory-360-opslaan';
+const N8N_360_GET_URL  = 'https://fab-n8n-dev-app-hsh6g7htbzcyajgs.westeurope-01.azurewebsites.net/webhook/fabory-360-ophalen';
+
+// ── TEAMLEDEN ──────────────────────────────────────────────────────
+const TEAM_MEMBERS = {
+  'Noord Oost NL': ['Mark de Haas','Marcel Jongman','Ron Klaver','David van Tol','Maarten Burger','Henk Keurentjes','Bas van der Vegte','Rene Jansen','Aryan Oosting','Pascal van Ginkel','Harold Bos','Bas Manni','Jos Vlaar','Arjan Tammenga'],
+  'West NL':       ['Xavier Rosalia','Anass Laamraoui','Peter van der Lely','Robbert Alblas','Mirjam van der Heiden','Arnout Jongejan','Jolanda van der Plas','Jorrit van der Westiel','Leo de Koning','Arnaud de Graaf'],
+  'Zuid NL':       ['Ed van Berkel','Bastiaan Anne','Jeremy Boom','Astrid Stulemeijer','Phaedra Ponson','Josefine Westijnhoven','Peggy van Zijl','Jos Bidlot','Karel van Elderen','Rolf van Geel','Paul Kroon','Sophia van der Putten','Bas Bastiaanssen','Yehudi Varenhout'],
+  'National Accounts': ['Paul Konijnenburg','Henny Morselt','Felice Hulsman','Rick van Boxtel','Rosalie Kerkhoff','Claudia van Houtum','Iris Verstappen','Linda de Mol','Tom Sluijter','Noud van RijsWestijk','Patrick Meijers','Jaap Bartels'],
+  'Petro':         ['Bart-Jan van der Jagt','Jeroen Kempes','Paul Bruseker','Willem Grootenboer','Rob Knippenberg','Ron van den Berg','Michel Langendijk','Laura Peeters'],
+};
+
+const SHAREPOINT_LIST = 'FaboryEnqueteResultaten';
+
+// ── LOAD DATA ─────────────────────────────────────────────────────
+async function loadData() {
+  document.getElementById('loadingOverlay').classList.add('visible');
+  document.getElementById('loadingMsg').textContent =
+    'Resultaten laden uit N8N…';
+
+  try {
+    const resp = await fetch(N8N_GET_URL, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+    });
+
+    if (!resp.ok) {
+      throw new Error(`N8N GET failed (${resp.status})`);
+    }
+
+    const rows = await resp.json();
+
+    // Handle N8N output: direct array [{naam:...,rol:...}] or [{json:{...}}]
+    let data = [];
+    if(Array.isArray(rows)) {
+      data = rows.map(r => {
+        // If row has json wrapper, unwrap it
+        if(r.json && typeof r.json === 'object') return r.json;
+        // Otherwise use row directly
+        return r;
+      }).filter(r => r && r.naam && r.email);
+    }
+
+    allData = data;
+    document.getElementById('loadingMsg').textContent =
+      `${allData.length} resultaten geladen…`;
+
+    applyFilter();
+
+  } catch (e) {
+    console.warn('N8N load failed:', e);
+
+    document.getElementById('loadingMsg').textContent =
+      'N8N tijdelijk niet bereikbaar (of getest in browser). CSV‑import blijft beschikbaar.';
+
+    setTimeout(() => {
+      document.getElementById('loadingOverlay').classList.remove('visible');
+      showCSVImportFallback();
+    }, 1500);
+
+    return;
+  }
+
+  document.getElementById('loadingOverlay').classList.remove('visible');
+}
+
+function showCSVImportFallback() {
+  // Show a simple file input at the top of the page as fallback
+  const existing = document.getElementById('csvFallback');
+  if(existing) return;
+  const bar = document.createElement('div');
+  bar.id = 'csvFallback';
+  bar.style.cssText = 'background:#fff8e1;border-bottom:2px solid #ff9800;padding:10px 32px;font-size:12px;color:#555;display:flex;align-items:center;gap:12px';
+  bar.innerHTML = `<span>⚠️ SharePoint niet beschikbaar. Upload CSV-bestanden:</span>
+    <input type="file" accept=".csv" multiple onchange="handleCSVFiles(this.files)" style="font-size:12px">`;
+  const target = document.querySelector('.section-bar') || document.querySelector('.filter-bar') || document.body.firstChild;
+  if(target) target.before(bar);
+}
+
+function handleCSVFiles(files) {
+  [...files].forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      let text = e.target.result;
+      if(text.charCodeAt(0)===0xFEFF) text=text.slice(1);
+      const lines = text.trim().split('\n');
+      if(lines.length<2) return;
+      const headers = lines[0].split(';').map(h=>h.replace(/^"|"$/g,'').trim());
+      const values  = lines[1].split(';').map(v=>v.replace(/^"|"$/g,'').replace(/""/g,'"').trim());
+      const row = {};
+      headers.forEach((h,i)=>row[h]=values[i]||'');
+      const idx = allData.findIndex(r=>r.email===row.email);
+      if(idx>=0) allData[idx]=row; else allData.push(row);
+      applyFilter();
+    };
+    reader.readAsText(file,'UTF-8');
+  });
+}
+
+// ── TEAM FILTER ───────────────────────────────────────────────────
+function setTeam(btn) {
+  document.querySelectorAll('.team-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeTeam = btn.dataset.team;
+  applyFilter();
+}
+
+function applyFilter() {
+  filtered = activeTeam === 'Alle teams' ? allData : allData.filter(r=>r.team===activeTeam);
+  const n = filtered.length;
+  document.getElementById('respondentBadge').textContent =
+    n + ' respondent' + (n===1?'':'en') + (activeTeam!=='Alle teams'?' · '+activeTeam:'');
+  renderTab(activeTab);
+}
+
+// ── TABS ──────────────────────────────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  activeTab = name;
+  renderTab(name);
+}
+
+function renderTab(name) {
+  if(name==='overzicht') renderOverzicht();
+  if(name==='heatmap')   renderHeatmap();
+  if(name==='training')  renderTraining();
+  if(name==='planning')  renderPlanning();
+  if(name==='persoon')   renderPersoonTab();
+  if(name==='driehonderdzestig') { show360Content(); populate360Teamlid(); populateVergelijkSelect(); }
+}
+
+function showContent(base) {
+  document.getElementById(base+'-empty').style.display   = filtered.length ? 'none'  : 'block';
+  document.getElementById(base+'-content').style.display = filtered.length ? 'block' : 'none';
+}
+
+// ── OVERZICHT ─────────────────────────────────────────────────────
+function renderOverzicht() {
+  showContent('overzicht'); if(!filtered.length) return;
+  const urgHoog = filtered.filter(r=>r.urgentie==='Hoog').length;
+  const zAvg = avg(filtered.map(r=>+r.zekerheid_score||0));
+  const allSc = filtered.flatMap(r=>ALL_SUBS.map(s=>+r[s.id+'_score']||0).filter(v=>v>0));
+  const gAvg = allSc.length ? (allSc.reduce((a,b)=>a+b)/allSc.length).toFixed(1) : '–';
+  const teams = [...new Set(filtered.map(r=>r.team))].length;
+
+  document.getElementById('kpiGrid').innerHTML = `
+    <div class="kpi-tile red"><div class="kpi-label">Respondenten</div><div class="kpi-value">${filtered.length}</div><div class="kpi-sub">${activeTeam!=='Alle teams'?activeTeam:'alle teams'}</div></div>
+    <div class="kpi-tile orange"><div class="kpi-label">Urgentie Hoog</div><div class="kpi-value">${urgHoog}</div><div class="kpi-sub">${pct(urgHoog,filtered.length)}% van selectie</div></div>
+    <div class="kpi-tile green"><div class="kpi-label">Gem. Zekerheid</div><div class="kpi-value">${zAvg.toFixed(1)}</div><div class="kpi-sub">van 5</div></div>
+    <div class="kpi-tile"><div class="kpi-label">Gem. Beheersing</div><div class="kpi-value">${gAvg}</div><div class="kpi-sub">alle onderdelen</div></div>
+    ${activeTeam==='Alle teams'?`<div class="kpi-tile"><div class="kpi-label">Teams actief</div><div class="kpi-value">${teams}</div><div class="kpi-sub">van 5</div></div>`:''}`;
+
+  document.getElementById('catAvgGrid').innerHTML = CATEGORIES.map(cat=>{
+    const sc = filtered.flatMap(r=>cat.subs.map(s=>+r[s.id+'_score']||0).filter(v=>v>0));
+    const a = sc.length?(sc.reduce((x,y)=>x+y)/sc.length).toFixed(1):'–';
+    const clr = a==='–'?'var(--gray-300)':scoreColor(+a);
+    return `<div style="background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 18px;border-left:4px solid ${clr}">
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;color:var(--gray-500);margin-bottom:5px">${cat.icon} ${cat.label}</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:26px;color:${clr}">${a}</div>
+      <div style="font-size:10px;color:var(--gray-500);margin-top:2px">gem. (1–5)</div>
+    </div>`;
+  }).join('');
+
+  const uc={Hoog:0,Middel:0,Laag:0};
+  filtered.forEach(r=>{if(uc[r.urgentie]!==undefined)uc[r.urgentie]++;});
+  document.getElementById('urgGrid').innerHTML=`
+    <div class="urg-card high"><div class="urg-label">🔴 Hoog</div><div class="urg-value">${uc.Hoog}</div><div class="urg-pct">${pct(uc.Hoog,filtered.length)}%</div></div>
+    <div class="urg-card med"><div class="urg-label">🟡 Middel</div><div class="urg-value">${uc.Middel}</div><div class="urg-pct">${pct(uc.Middel,filtered.length)}%</div></div>
+    <div class="urg-card low"><div class="urg-label">🟢 Laag</div><div class="urg-value">${uc.Laag}</div><div class="urg-pct">${pct(uc.Laag,filtered.length)}%</div></div>`;
+
+  const vc={};
+  filtered.forEach(r=>{const v=r.voorkeur_vorm||'–';vc[v]=(vc[v]||0)+1;});
+  document.getElementById('vormGrid').innerHTML=Object.entries(vc).map(([v,c])=>
+    `<div style="background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 18px;text-align:center">
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;color:var(--gray-500);margin-bottom:5px">${v}</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:26px">${c}</div>
+      <div style="font-size:10px;color:var(--gray-500)">${pct(c,filtered.length)}%</div>
+    </div>`).join('');
+}
+
+// ── HEATMAP ───────────────────────────────────────────────────────
+function renderHeatmap() {
+  showContent('heatmap'); if(!filtered.length) return;
+  let html='<thead><tr><th class="name-col">Medewerker</th>';
+  CATEGORIES.forEach(c=>{ html+=`<th class="cat-h" colspan="${c.subs.length}">${c.icon} ${c.label}</th>`; });
+  html+='<th>Zeker</th></tr><tr><th class="name-col"></th>';
+  ALL_SUBS.forEach(s=>{ html+=`<th>${s.label}</th>`; });
+  html+='<th></th></tr></thead><tbody>';
+
+  filtered.forEach(r=>{
+    html+=`<tr><td class="name-cell">${r.naam||'–'}<br><span style="font-size:9px;color:var(--gray-500)">${r.team||''}</span></td>`;
+    ALL_SUBS.forEach(s=>{ const sc=+r[s.id+'_score']||0; html+=`<td><span class="score-cell score-${sc}" title="${STAR_LABELS[sc]||'–'}">${sc||'–'}</span></td>`; });
+    const z=+r.zekerheid_score||0;
+    html+=`<td><span class="score-cell score-${z}">${z||'–'}</span></td></tr>`;
+  });
+
+  html+='<tr class="avg-row"><td class="name-cell" style="color:var(--gray-500);font-style:italic">Gemiddelde</td>';
+  ALL_SUBS.forEach(s=>{
+    const sc=filtered.map(r=>+r[s.id+'_score']||0).filter(v=>v>0);
+    const a=sc.length?(sc.reduce((x,y)=>x+y)/sc.length).toFixed(1):'–';
+    html+=`<td><span style="font-size:11px;font-weight:700;color:${a==='–'?'var(--gray-300)':scoreColor(+a)}">${a}</span></td>`;
+  });
+  const za=avg(filtered.map(r=>+r.zekerheid_score||0).filter(v=>v>0));
+  html+=`<td><span style="font-size:11px;font-weight:700">${za.toFixed(1)}</span></td></tr></tbody>`;
+  document.getElementById('heatmapTable').innerHTML=html;
+}
+
+// ── TRAINING ──────────────────────────────────────────────────────
+function renderTraining() {
+  showContent('training'); if(!filtered.length) return;
+  const counts={};
+  ALL_SUBS.forEach(s=>{ counts[s.id]=0; });
+  filtered.forEach(r=>{
+    (r.training_gewenst||'').split('|').forEach(id=>{const t=id.trim();if(counts[t]!==undefined)counts[t]++;});
+    ALL_SUBS.forEach(s=>{
+      const b=r[s.id+'_behoefte']||'';
+      if(b.includes('training')||b.includes('sessie')||b.includes('coaching')) counts[s.id]+=0.5;
+    });
+  });
+  const sorted=ALL_SUBS.map(s=>({...s,count:counts[s.id]||0})).sort((a,b)=>b.count-a.count);
+  const max=sorted[0]?.count||1;
+  const rc=['gold','silver','bronze'];
+  document.getElementById('topList').innerHTML=sorted.slice(0,10).map((s,i)=>`
+    <div class="top-item">
+      <div class="top-rank ${rc[i]||''}">${i+1}</div>
+      <div class="top-info"><div class="top-name">${s.label}</div><div class="top-cat">${s.cat}</div></div>
+      <div class="top-bar-bg" style="flex:1"><div class="top-bar-fill" style="width:${s.count/max*100}%"></div></div>
+      <div class="top-count">${Math.round(s.count)}×</div>
+    </div>`).join('');
+
+  const opmerkingen=filtered.flatMap(r=>ALL_SUBS.map(s=>r[s.id+'_opmerking']?{naam:r.naam,team:r.team,sub:s.label,cat:s.cat,tekst:r[s.id+'_opmerking']}:null).filter(Boolean));
+  document.getElementById('knelpuntenList').innerHTML=opmerkingen.length
+    ?opmerkingen.map(o=>`<div style="padding:10px 14px;border-bottom:1px solid var(--border)">
+        <span style="font-size:10px;font-weight:600;color:var(--red);text-transform:uppercase">${o.cat} › ${o.sub}</span>
+        <span style="font-size:10px;color:var(--gray-500);margin-left:7px">${o.naam}</span>
+        <span class="team-tag" style="margin-left:5px">${o.team||''}</span>
+        <div style="font-size:12px;color:var(--gray-700);margin-top:3px;font-style:italic">"${o.tekst}"</div>
+      </div>`).join('')
+    :'<div style="padding:16px;color:var(--gray-500);font-size:12px;text-align:center">Geen opmerkingen</div>';
+}
+
+// ── PLANNING ──────────────────────────────────────────────────────
+function renderPlanning() {
+  showContent('planning'); if(!filtered.length) return;
+  const uw={Hoog:3,Middel:2,Laag:1};
+  const rows=ALL_SUBS.map(s=>{
+    const deel=filtered.filter(r=>{
+      const b=r[s.id+'_behoefte']||'',t=r.training_gewenst||'';
+      return b.includes('training')||b.includes('sessie')||b.includes('coaching')||t.includes(s.id);
+    });
+    if(!deel.length) return null;
+    const sc=deel.map(r=>+r[s.id+'_score']||0).filter(v=>v>0);
+    const gSc=sc.length?(sc.reduce((a,b)=>a+b)/sc.length):0;
+    const gUrg=deel.reduce((sum,r)=>sum+(uw[r.urgentie]||0),0)/deel.length;
+    const urgL=gUrg>=2.5?'Hoog':gUrg>=1.5?'Middel':'Laag';
+    const vv=deel.map(r=>r.voorkeur_vorm||'');
+    const kl=vv.filter(v=>v==='Klassikaal'||v==='Beide').length;
+    const on=vv.filter(v=>v==='Korte online sessie'||v==='Beide').length;
+    const vp=kl>=on?'Klassikaal':'Online';
+    return {s,n:deel.length,gSc,urgL,gUrg,vp};
+  }).filter(Boolean).sort((a,b)=>b.gUrg-a.gUrg||b.n-a.n);
+
+  document.getElementById('planningBody').innerHTML=rows.map((r,i)=>{
+    const groep=r.n<=4?'1 groep':r.n<=8?'1–2 groepen':Math.ceil(r.n/6)+' groepen';
+    return `<tr>
+      <td style="font-weight:600;color:var(--gray-500)">${i+1}</td>
+      <td style="font-weight:600">${r.s.label}</td>
+      <td style="color:var(--gray-500)">${r.s.cat}</td>
+      <td><strong>${r.n}</strong> pers.</td>
+      <td><span style="color:${scoreColor(r.gSc)};font-weight:600">${r.gSc.toFixed(1)}</span></td>
+      <td><span class="badge ${r.urgL.toLowerCase()}">${r.urgL}</span></td>
+      <td><span class="badge ${r.vp==='Klassikaal'?'klassikaal':'online'}">${r.vp}</span></td>
+      <td>${groep}</td></tr>`;
+  }).join('');
+}
+
+// ── PER PERSOON ───────────────────────────────────────────────────
+function renderPersoonTab() {
+  showContent('persoon'); if(!filtered.length) return;
+  const sel=document.getElementById('persoonSelect');
+  const cur=sel.value;
+  sel.innerHTML=filtered.map(r=>`<option value="${r.email}">${r.naam} – ${r.team}</option>`).join('');
+  if(cur&&filtered.find(r=>r.email===cur)) sel.value=cur;
+  renderPersoon();
+}
+
+function renderPersoon() {
+  const email=document.getElementById('persoonSelect').value;
+  const r=filtered.find(p=>p.email===email);
+  if(!r) return;
+  const init=(r.naam||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+
+  let html=`<div class="persoon-card">
+    <div class="persoon-header">
+      <div class="persoon-avatar">${init}</div>
+      <div>
+        <div class="persoon-name">${r.naam}</div>
+        <div class="persoon-meta">${r.rol} · ${r.team} · ${r.ervaring} · Zekerheid: ${r.zekerheid_score}/5 · Urgentie: ${r.urgentie}</div>
+      </div>
+    </div>
+    <div class="persoon-body"><div class="persoon-grid">`;
+
+  CATEGORIES.forEach(cat=>cat.subs.forEach(s=>{
+    const sc=+r[s.id+'_score']||0;
+    const beh=r[s.id+'_behoefte']||'';
+    const opm=r[s.id+'_opmerking']||'';
+    html+=`<div class="psi">
+      <div class="psi-cat">${cat.icon} ${cat.label}</div>
+      <div class="psi-name">${s.label}</div>
+      <div><span class="psi-stars">${'★'.repeat(sc)}${'☆'.repeat(5-sc)}</span> <span class="psi-num">${STAR_LABELS[sc]||'–'}</span></div>
+      ${beh?`<div class="psi-beh">${beh.split('|').map(b=>`<span>${b.trim()}</span>`).join('')}</div>`:''}
+      ${opm?`<div class="opm-row">"${opm}"</div>`:''}
+    </div>`;
+  }));
+  html+='</div>';
+  if(r.meeste_tijd||r.minst_zeker_klant||r.opmerkingen){
+    html+='<div style="display:grid;gap:8px;margin-top:8px">';
+    if(r.meeste_tijd) html+=`<div class="opm-row"><strong>Meeste tijd:</strong> ${r.meeste_tijd}</div>`;
+    if(r.minst_zeker_klant) html+=`<div class="opm-row"><strong>Minst zeker (klant):</strong> ${r.minst_zeker_klant}</div>`;
+    if(r.opmerkingen) html+=`<div class="opm-row"><strong>Opmerkingen:</strong> ${r.opmerkingen}</div>`;
+    html+='</div>';
+  }
+  html+='</div></div>';
+  document.getElementById('persoonDetail').innerHTML=html;
+}
+
+// ── PDF ───────────────────────────────────────────────────────────
+function openPDF() {
+  const email=document.getElementById('persoonSelect').value;
+  const r=filtered.find(p=>p.email===email);
+  if(!r) return;
+  const datum=new Date().toLocaleDateString('nl-NL');
+  const init=(r.naam||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  const stars=v=>'★'.repeat(v)+'☆'.repeat(5-v);
+  const sclr=v=>v>=4?'#2e7d32':v>=3?'#f9a825':v>=2?'#e65100':'#c8102e';
+  const scbg=v=>v>=4?'#e8f5e9':v>=3?'#fffde7':v>=2?'#fff8e1':'#fdeaed';
+  const uclr=u=>({Hoog:'#c8102e',Middel:'#e65100',Laag:'#2e7d32'}[u]||'#777');
+  const ubg=u=>({Hoog:'#fdeaed',Middel:'#fff8e1',Laag:'#e8f5e9'}[u]||'#f4f4f4');
+  const allSc=ALL_SUBS.map(s=>+r[s.id+'_score']||0).filter(v=>v>0);
+  const gemScore=allSc.length?(allSc.reduce((a,b)=>a+b)/allSc.length).toFixed(1):'–';
+  const fouten=(r.fouten||'').split('|').map(s=>s.trim()).filter(Boolean);
+  const gewenst=(r.training_gewenst||'').split('|').map(s=>s.trim()).filter(Boolean);
+  const prios=ALL_SUBS.filter(s=>gewenst.includes(s.id)).map(s=>({...s,score:+r[s.id+'_score']||0})).sort((a,b)=>a.score-b.score);
+  const directActie=ALL_SUBS.filter(s=>[1,2].includes(+r[s.id+'_score']||0));
+  const verbetering=ALL_SUBS.filter(s=>(+r[s.id+'_score']||0)===3);
+  const sterk=ALL_SUBS.filter(s=>(+r[s.id+'_score']||0)>=4);
+
+  let catRows='';
+  CATEGORIES.forEach(cat=>{
+    catRows+=`<tr><td colspan="4" style="background:#111;color:white;padding:6px 10px;font-weight:700;font-size:10px">${cat.icon} ${cat.label}</td></tr>`;
+    catRows+=`<tr style="background:#eee"><td style="font-size:8px;font-weight:700;color:#777;padding:4px 10px">ONDERDEEL</td><td style="font-size:8px;font-weight:700;color:#777;padding:4px 8px">BEHEERSING</td><td style="font-size:8px;font-weight:700;color:#777;padding:4px 8px">SCORE</td><td style="font-size:8px;font-weight:700;color:#777;padding:4px 8px">VOORKEUR</td></tr>`;
+    cat.subs.forEach((s,i)=>{
+      const sc=+r[s.id+'_score']||0,beh=(r[s.id+'_behoefte']||''),opm=r[s.id+'_opmerking']||'';
+      catRows+=`<tr style="background:${i%2===0?'white':'#fafafa'}">
+        <td style="padding:5px 10px;font-size:9px;font-weight:600">${s.label}${opm?`<br><em style="color:#666;font-size:8px">"${opm}"</em>`:''}
+        </td>
+        <td style="padding:5px 8px;font-size:10px;color:${sclr(sc)};font-weight:700">${stars(sc)}</td>
+        <td style="padding:5px 8px"><span style="background:${scbg(sc)};color:${sclr(sc)};padding:1px 6px;border-radius:10px;font-size:8px;font-weight:700">${STAR_LABELS[sc]||'–'}</span></td>
+        <td style="padding:5px 8px;font-size:8px;color:#555">${beh.replace(/\|/g,'<br>')||'–'}</td></tr>`;
+    });
+  });
+
+  const urgAdvies={Hoog:'Trainingsstart binnen 4 weken aanbevolen.',Middel:'Trainingsstart binnen 2 maanden aanbevolen.',Laag:'Meenemen in het jaarlijkse opleidingsplan.'}[r.urgentie]||'–';
+  const vormAdvies={'Klassikaal':'Klassikale sessies – groepsverband max. 6 pers.','Korte online sessie':'Online modules – 45–60 min.','Beide':'Open voor beide vormen.'}[r.voorkeur_vorm]||r.voorkeur_vorm;
+
+  const html=`<!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8"><title>Fabory Dossier – ${r.naam}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;font-size:10px;color:#111;background:white}
+    @media print{@page{size:A4;margin:15mm 18mm 18mm}body{print-color-adjust:exact;-webkit-print-color-adjust:exact}.page-break{page-break-before:always}.no-print{display:none}}
+    .page{max-width:210mm;margin:0 auto;padding:18px}
+    .dh{background:#111;color:white;padding:14px 18px;display:flex;align-items:center;gap:14px}
+    .logo{font-size:20px;font-weight:700;color:white}.logo span{color:#C8102E}
+    .hdiv{width:1px;height:22px;background:#444}.hsub{font-size:10px;color:#aaa;letter-spacing:.5px;text-transform:uppercase}
+    .rb{height:4px;background:#C8102E;margin-bottom:18px}
+    .av-row{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+    .av{width:48px;height:48px;border-radius:50%;background:#C8102E;color:white;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .cn{font-size:20px;font-weight:700}.cr{font-size:11px;color:#777;margin-top:2px}.cm{font-size:9px;color:#aaa;margin-top:3px}
+    .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}
+    .kpi{background:#f4f4f4;padding:10px 7px;text-align:center;border-radius:4px}
+    .kv{font-size:18px;font-weight:700;margin-bottom:3px}.kl{font-size:7.5px;text-transform:uppercase;letter-spacing:.4px;color:#777;font-weight:600}
+    .pb{background:#fdeaed;border-left:3px solid #C8102E;padding:9px 12px;margin-bottom:0}
+    .pt{font-size:7.5px;font-weight:700;color:#C8102E;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+    .pbody{font-size:8.5px;color:#555;line-height:1.6}
+    .st{font-size:12px;font-weight:700;color:#C8102E;border-bottom:1.5px solid #C8102E;padding-bottom:3px;margin:16px 0 8px}
+    table{width:100%;border-collapse:collapse;font-size:9px}th{background:#eee;text-align:left;padding:4px 8px;font-size:8px;color:#777;text-transform:uppercase;letter-spacing:.3px}td{padding:4px 8px;border-bottom:.5px solid #eee;vertical-align:top}
+    .ki{background:#fdeaed;border-left:3px solid #C8102E;padding:4px 9px;margin-bottom:4px;font-size:9px}
+    .ab{margin-bottom:8px}.ah{padding:5px 9px;font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+    .ai{padding:3px 9px 3px 18px;font-size:8.5px;color:#555;border-left:3px solid;border-bottom:.3px solid #eee;background:#fafafa}
+    .at td:first-child{background:#eee;font-weight:700;font-size:8px;color:#555;width:90px;text-transform:uppercase;letter-spacing:.3px}
+    .at td{padding:7px 9px;border-bottom:.5px solid #ddd}
+    .sr{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:18px}
+    .sb{padding-top:7px}.sl{font-size:7.5px;font-weight:700;color:#aaa;text-transform:uppercase;margin-bottom:26px}
+    .sln{border-bottom:.5px solid #ccc;margin-bottom:4px}.sn{font-size:8.5px;color:#aaa;font-style:italic}
+    .df{font-size:7px;color:#aaa;text-align:center;margin-top:18px;padding-top:7px;border-top:.5px solid #ddd}
+    .no-print-bar{background:#111;color:white;padding:10px 18px;text-align:center;font-size:12px;position:fixed;top:0;left:0;right:0;z-index:999}
+    .no-print-bar button{background:#C8102E;color:white;border:none;padding:7px 18px;border-radius:4px;font-size:12px;cursor:pointer;margin-left:10px;font-weight:600}
+    .cw{margin-top:48px}@media print{.cw{margin-top:0}}
+  
+/* DRAG & DROP */
+.drop-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:24px;text-align:center;color:var(--gray-500);font-size:13px;cursor:pointer;transition:all .2s;background:var(--white)}
+.drop-zone:hover,.drop-zone.dragover{border-color:#003087;background:#f0f4ff;color:#003087}
+.drop-zone .dz-icon{font-size:28px;margin-bottom:8px}
+.drop-zone input[type=file]{display:none}
+.drop-zone-label{font-weight:600;font-size:13px;color:#003087;cursor:pointer}
+.drop-zone-sub{font-size:11px;color:var(--gray-500);margin-top:4px}
+.import-status{font-size:12px;color:#2e7d32;font-weight:600;margin-top:8px;min-height:18px}
+
+/* 360 ANALYSIS */
+.dash-section-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px}
+.dash-section-tab{padding:10px 20px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--gray-500);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s}
+.dash-section-tab:hover{color:var(--black)}
+.dash-section-tab.active{color:#003087;border-bottom-color:#003087;font-weight:700}
+.analysis-360-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.kpi-360{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 16px;text-align:center}
+.kpi-360 .kv{font-size:28px;font-weight:700;margin-bottom:4px}
+.kpi-360 .kl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--gray-500)}
+.kpi-360 .ks{font-size:11px;color:var(--gray-500);margin-top:3px}
+.gap-table{width:100%;border-collapse:collapse;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.gap-table th{background:#111;color:white;padding:9px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;text-align:left}
+.gap-table td{padding:8px 12px;border-bottom:1px solid var(--gray-100);font-size:12px}
+.gap-table tr:last-child td{border-bottom:none}
+.gap-table tr:nth-child(even) td{background:#fafafa}
+.gap-pos{background:#e8f5e9;color:#2e7d32;font-weight:700;border-radius:3px;padding:2px 6px}
+.gap-neg{background:#fdeaed;color:#c8102e;font-weight:700;border-radius:3px;padding:2px 6px}
+.gap-zero{background:#f4f4f4;color:#777;border-radius:3px;padding:2px 6px}
+
+/* ── NIEUWE NAVIGATIE ── */
+.filter-bar{background:#fff;border-bottom:1px solid var(--border);padding:8px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:48px}
+.filter-label{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.4px;margin-right:4px}
+.team-btn{padding:5px 13px;border:1.5px solid var(--border);border-radius:20px;background:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:#666;cursor:pointer;transition:all .15s}
+.team-btn:hover{border-color:#003087;color:#003087}
+.team-btn.active{background:#003087;border-color:#003087;color:#fff;font-weight:600}
+.import-modal-btn{padding:6px 14px;border:1.5px solid #003087;border-radius:4px;background:#fff;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#003087;cursor:pointer;transition:all .15s;white-space:nowrap}
+.import-modal-btn:hover{background:#003087;color:#fff}
+.section-bar{background:#fff;border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center}
+.section-btn{padding:12px 20px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:#888;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s}
+.section-btn:hover{color:#003087}
+.section-btn.active{color:#003087;border-bottom-color:#003087;font-weight:700}
+.subtabs-bar{background:#fff;border-bottom:1px solid var(--border);padding:6px 16px;display:flex;align-items:center;gap:4px}
+.tab-btn{padding:7px 14px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:#888;cursor:pointer;border-radius:4px;transition:all .15s}
+.tab-btn:hover{background:#f0f4ff;color:#003087}
+.tab-btn.active{background:#003087;color:#fff;font-weight:600}
+/* ── MODALS ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.visible{display:flex}
+.modal-box{background:#fff;border-radius:8px;padding:28px;width:460px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:16px;color:#003087;display:flex;align-items:center;gap:8px}
+.modal-close{margin-left:auto;border:none;background:none;font-size:22px;cursor:pointer;color:#888;line-height:1;padding:0}
+.modal-close:hover{color:#111}
+.modal-drop-zone{border:2px dashed #003087;border-radius:6px;padding:28px;text-align:center;cursor:pointer;background:#f8fafd;transition:all .2s}
+.modal-drop-zone:hover,.modal-drop-zone.dragover{background:#e8f2fa}
+
+
+/* ── 360 FORMULIER ── */
+.s360-setup-card{background:#fff;border-radius:6px;box-shadow:0 2px 12px rgba(0,0,0,.08);padding:20px;margin-bottom:12px}
+.s360-card{background:#fff;border-radius:6px;box-shadow:0 2px 12px rgba(0,0,0,.08);overflow:hidden;margin-bottom:12px}
+.s360-cat-hdr{padding:10px 16px;display:flex;align-items:center;gap:8px;color:#fff;font-size:14px;font-weight:600}
+.s360-row{display:flex;align-items:center;padding:9px 16px;border-bottom:1px solid #f0f0f0;gap:8px}
+.s360-row:last-child{border-bottom:none}
+.s360-row:nth-child(even){background:#fafafa}
+.s360-label{flex:1;font-size:12px;color:#333;font-weight:500}
+.s360-self{font-size:10px;white-space:nowrap;min-width:50px;text-align:right}
+.s360-stars{display:flex;gap:2px}
+.s360-star{background:none;border:none;font-size:19px;cursor:pointer;color:#ddd;padding:1px;line-height:1;transition:color .1s}
+.s360-star.active{color:#f5a623}
+.s360-field-label{font-size:10px;font-weight:700;color:#777;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px}
+.s360-select,.s360-input{width:100%;padding:8px 10px;border:1.5px solid #e0e0e0;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:13px}
+.s360-submit-btn{background:#003087;color:#fff;border:none;padding:12px 36px;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s}
+.s360-submit-btn:hover{background:#002060}
+.s360-submit-btn:disabled{background:#ccc;cursor:not-allowed}
+/* gap table */
+.gap-tbl{width:100%;border-collapse:collapse;background:#fff;border-radius:6px;box-shadow:0 2px 12px rgba(0,0,0,.08);overflow:hidden;margin-bottom:16px}
+.gap-tbl th{background:#111;color:#fff;padding:9px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;text-align:left}
+.gap-tbl td{padding:8px 12px;border-bottom:1px solid #f0f0f0;font-size:12px}
+.gap-tbl tr:last-child td{border-bottom:none}
+.gap-pos{background:#e8f5e9;color:#2e7d32;font-weight:700;border-radius:3px;padding:2px 6px}
+.gap-neg{background:#fdeaed;color:#c8102e;font-weight:700;border-radius:3px;padding:2px 6px}
+.gap-zero{background:#f4f4f4;color:#777;border-radius:3px;padding:2px 6px}
+.kpi360-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px}
+.kpi360{background:#fff;border-radius:6px;box-shadow:0 2px 12px rgba(0,0,0,.08);padding:16px;text-align:center}
+.kpi360-val{font-size:26px;font-weight:700;margin-bottom:2px}
+.kpi360-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#777}
+.kpi360-sub{font-size:11px;color:#999;margin-top:2px}
+
+</style></head><body>
+  <div class="no-print-bar no-print">📄 Fabory Personeelsdossier – ${r.naam} · ${r.team}
+    <button onclick="window.print()">🖨 Opslaan als PDF</button>
+    <button onclick="window.close()" style="background:#333;margin-left:8px">✕ Sluiten</button>
+  </div>
+  <div class="cw"><div class="page">
+    <div class="dh"><div class="logo">F<span>.</span></div><div class="hdiv"></div><div class="hsub">Inside Sales · Personeelsdossier · Opleidingsenquête</div></div>
+    <div class="rb"></div>
+    <div class="av-row"><div class="av">${init}</div><div><div class="cn">${r.naam}</div><div class="cr">${r.rol} · <span style="background:#e3f2fd;color:#0d47a1;padding:1px 7px;border-radius:10px;font-size:9px;font-weight:600">${r.team}</span></div><div class="cm">Ingevuld: ${r.timestamp||datum} · Ervaring: ${r.ervaring} · Gegenereerd: ${datum}</div></div></div>
+    <div class="kpi-row">
+      <div class="kpi"><div class="kv">${r.zekerheid_score}/5</div><div class="kl">Zekerheid</div></div>
+      <div class="kpi"><div class="kv">${gemScore}</div><div class="kl">Gem. beheersing</div></div>
+      <div class="kpi"><div class="kv" style="color:${uclr(r.urgentie)}">${r.urgentie||'–'}</div><div class="kl">Urgentie</div></div>
+      <div class="kpi"><div class="kv" style="font-size:12px">${r.voorkeur_vorm||'–'}</div><div class="kl">Voorkeur vorm</div></div>
+      <div class="kpi"><div class="kv" style="font-size:12px">${r.team||'–'}</div><div class="kl">Team</div></div>
+    </div>
+    <div class="pb"><div class="pt">Doel van dit document</div><div class="pbody">Dit dossier is opgesteld op basis van de ingevulde opleidingsenquête en bevat een volledig overzicht van de zelfgerapporteerde beheersing per onderdeel, trainingsbehoeftes, verbeterpunten en een persoonlijk opleidingsadvies. Bedoeld voor het personeelsdossier en als basis voor het opleidingsgesprek.</div></div>
+    <div class="df">Fabory · Vertrouwelijk personeelsdossier · ${r.naam} · Pagina 1</div>
+  </div>
+
+  <div class="page page-break">
+    <div class="dh"><div class="logo">F<span>.</span></div><div class="hdiv"></div><div class="hsub">${r.naam} · Beheersing per categorie</div></div><div class="rb"></div>
+    <div style="font-size:14px;font-weight:700;margin-bottom:8px">Beheersing per categorie</div>
+    <table>${catRows}</table>
+    <div class="df">Fabory · Vertrouwelijk · ${r.naam} · Pagina 2</div>
+  </div>
+
+  <div class="page page-break">
+    <div class="dh"><div class="logo">F<span>.</span></div><div class="hdiv"></div><div class="hsub">${r.naam} · Knelpunten & Analyse</div></div><div class="rb"></div>
+    <div style="font-size:14px;font-weight:700;margin-bottom:8px">Knelpunten & Zelfanalyse</div>
+    <div class="st">Zelfgerapporteerde knelpunten</div>
+    ${fouten.length?fouten.map(id=>{const s=ALL_SUBS.find(x=>x.id===id);return s?`<div class="ki">• ${s.cat} – ${s.label}</div>`:'';}).join(''):'<p style="color:#aaa;font-size:9px">Geen opgegeven</p>'}
+    <div class="st">Open antwoorden</div>
+    <table class="at">
+      ${r.meeste_tijd?`<tr><td>Meeste tijd</td><td>${r.meeste_tijd}</td></tr>`:''}
+      ${r.minst_zeker_klant?`<tr><td>Minst zeker (klant)</td><td>${r.minst_zeker_klant}</td></tr>`:''}
+      ${r.opmerkingen?`<tr><td>Opmerkingen</td><td>${r.opmerkingen}</td></tr>`:''}
+    </table>
+    <div class="df">Fabory · Vertrouwelijk · ${r.naam} · Pagina 3</div>
+  </div>
+
+  <div class="page page-break">
+    <div class="dh"><div class="logo">F<span>.</span></div><div class="hdiv"></div><div class="hsub">${r.naam} · Opleidingsadvies & Afspraken</div></div><div class="rb"></div>
+    <div style="font-size:14px;font-weight:700;margin-bottom:8px">Opleidingsadvies & Afspraken</div>
+    <div class="st">Gewenste trainingsonderwerpen (prioriteit op score)</div>
+    <table><tr><th style="width:26px">#</th><th>Onderwerp</th><th>Beheersing</th><th>Voorkeur</th></tr>
+    ${prios.length?prios.map((s,i)=>`<tr style="background:${i%2===0?'white':'#fafafa'}">
+      <td style="font-weight:700;color:${i<3?'#c8102e':'#aaa'};font-size:13px;text-align:center">${i+1}</td>
+      <td style="font-weight:600">${s.label}<br><span style="font-weight:400;color:#777;font-size:8px">${s.cat}</span></td>
+      <td style="font-size:10px;color:${sclr(s.score)}">${stars(s.score)}</td>
+      <td style="font-size:8px;color:#555">${(r[s.id+'_behoefte']||'–').replace(/\|/g,' / ')}</td></tr>`).join(''):'<tr><td colspan="4" style="color:#aaa;font-style:italic">Geen opgegeven</td></tr>'}
+    </table>
+    <div class="st">Concreet opleidingsadvies</div>
+    ${directActie.length?`<div class="ab"><div class="ah" style="background:#fdeaed;color:#c8102e">DIRECT ACTIE VEREIST (score 1–2)</div>${directActie.slice(0,6).map(s=>`<div class="ai" style="border-color:#c8102e">${s.cat} – ${s.label}: score ${r[s.id+'_score']}/5</div>`).join('')}</div>`:''}
+    ${verbetering.length?`<div class="ab"><div class="ah" style="background:#fff8e1;color:#e65100">VERBETERING MOGELIJK (score 3)</div>${verbetering.slice(0,6).map(s=>`<div class="ai" style="border-color:#e65100">${s.cat} – ${s.label}</div>`).join('')}</div>`:''}
+    ${sterk.length?`<div class="ab"><div class="ah" style="background:#e8f5e9;color:#2e7d32">STERKE PUNTEN (score 4–5)</div>${sterk.slice(0,5).map(s=>`<div class="ai" style="border-color:#2e7d32">${s.cat} – ${s.label}</div>`).join('')}</div>`:''}
+    <div class="st">Afspraken & Planning</div>
+    <table class="at">
+      <tr><td>Urgentie</td><td><span style="background:${ubg(r.urgentie)};color:${uclr(r.urgentie)};padding:1px 7px;border-radius:10px;font-size:8px;font-weight:700">${r.urgentie}</span> ${urgAdvies}</td></tr>
+      <tr><td>Trainingsvorm</td><td>${vormAdvies}</td></tr>
+      ${prios[0]?`<tr><td>Prioriteit #1</td><td><strong>${prios[0].cat} – ${prios[0].label}</strong> (score ${prios[0].score}/5)</td></tr>`:''}
+      ${prios[1]?`<tr><td>Prioriteit #2</td><td>${prios[1].cat} – ${prios[1].label} (score ${prios[1].score}/5)</td></tr>`:''}
+      ${prios[2]?`<tr><td>Prioriteit #3</td><td>${prios[2].cat} – ${prios[2].label} (score ${prios[2].score}/5)</td></tr>`:''}
+    </table>
+    <div class="st">Ondertekening</div>
+    <div class="sr">
+      <div class="sb"><div class="sl">Medewerker</div><div class="sln"></div><div class="sn">${r.naam}</div></div>
+      <div class="sb"><div class="sl">Leidinggevende</div><div class="sln"></div><div class="sn">Naam + handtekening</div></div>
+      <div class="sb"><div class="sl">Datum afspraak</div><div class="sln"></div><div class="sn">____ / ____ / ________</div></div>
+    </div>
+    <div class="df">Fabory · Vertrouwelijk personeelsdossier · ${r.naam} · Pagina 4</div>
+  </div></div></body></html>`;
+
+  const w=window.open('','_blank');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(()=>w.print(),700);
+}
+
+// ── EXPORTS ───────────────────────────────────────────────────────
+function exportExcel() {
+  const data = filtered.length ? filtered : allData;
+  if(!data.length) { alert('Geen data om te exporteren. Laad eerst data via ↺ Vernieuwen of CSV-import.'); return; }
+  const headers = Object.keys(data[0]);
+  const rows = data.map(r=>headers.map(h=>`"${String(r[h]||'').replace(/"/g,'""')}"`).join(';'));
+  const label = activeTeam && activeTeam !== 'Alle teams' ? activeTeam.replace(/ /g,'_') : 'alle_teams';
+  dlText('\uFEFF'+headers.join(';')+'\n'+rows.join('\n'), `fabory_resultaten_${label}_${today()}.csv`, 'text/csv;charset=utf-8;');
+}
+function exportPlanning() {
+  const data = filtered.length ? filtered : allData;
+  if(!data.length) { alert('Geen data beschikbaar.'); return; }
+  const rows=[['#','Onderwerp','Categorie','Deelnemers','Gem. score','Urgentie','Vorm']];
+  const uw={Hoog:3,Middel:2,Laag:1};
+  ALL_SUBS.forEach((s,i)=>{
+    const deel=data.filter(r=>{const b=r[s.id+'_behoefte']||'',t=r.training_gewenst||'';return b.includes('training')||b.includes('sessie')||b.includes('coaching')||t.includes(s.id);});
+    if(!deel.length) return;
+    const sc=deel.map(r=>+r[s.id+'_score']||0).filter(v=>v>0);
+    const gSc=sc.length?(sc.reduce((a,b)=>a+b)/sc.length).toFixed(1):0;
+    const gUrg=deel.reduce((sum,r)=>sum+(uw[r.urgentie]||0),0)/deel.length;
+    const urgL=gUrg>=2.5?'Hoog':gUrg>=1.5?'Middel':'Laag';
+    const vv=deel.map(r=>r.voorkeur_vorm||'');
+    const vp=vv.filter(v=>v==='Klassikaal'||v==='Beide').length>=vv.filter(v=>v==='Korte online sessie'||v==='Beide').length?'Klassikaal':'Online';
+    rows.push([rows.length,s.label,s.cat,deel.length,gSc,urgL,vp]);
+  });
+  dlText('\uFEFF'+rows.map(r=>r.join(';')).join('\n'), `fabory_planning_${today()}.csv`, 'text/csv;charset=utf-8;');
+}
+function exportPersoonCSV() {
+  const email = document.getElementById('persoonSelect').value;
+  const data = filtered.length ? filtered : allData;
+  const r = data.find(p=>p.email===email);
+  if(!r) { alert('Selecteer eerst een medewerker.'); return; }
+  const h = Object.keys(r);
+  dlText('\uFEFF'+h.join(';')+'\n'+h.map(k=>`"${String(r[k]||'').replace(/"/g,'""')}"`).join(';'), `fabory_profiel_${r.naam.replace(/\s+/g,'_')}_${today()}.csv`, 'text/csv;charset=utf-8;');
+}
+
+function dlText(content,filename,mime) {
+  const blob=new Blob([content],{type:mime});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=filename;
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────
+function avg(arr){return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0}
+function pct(n,t){return t?Math.round(n/t*100):0}
+function today(){return new Date().toISOString().slice(0,10)}
+function scoreColor(v){if(v>=4.5)return'#1b5e20';if(v>=3.5)return'#2e7d32';if(v>=2.5)return'#f9a825';if(v>=1.5)return'#e65100';return'#c62828'}
+
+// ── 360 STATE ─────────────────────────────────────────────────────
+let sup360scores = {};   // { sub_id: score 1-5 }
+let sup360data   = [];   // loaded supervisor CSVs: [{sup_naam, teamlid_email, scores...}]
+
+// ── 360 TAB SWITCH ────────────────────────────────────────────────
+function switch360(pane, btn) {
+  document.querySelectorAll('.subtab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('pane-invullen').style.display  = pane==='invullen'  ? 'block' : 'none';
+  document.getElementById('pane-vergelijk').style.display = pane==='vergelijk' ? 'block' : 'none';
+  if(pane==='vergelijk') populateVergelijkSelect();
+}
+
+// ── 360 CONTENT SHOW/HIDE ─────────────────────────────────────────
+function show360Content() {
+  document.getElementById('360-empty').style.display   = filtered.length ? 'none'  : 'block';
+  document.getElementById('360-content').style.display = filtered.length ? 'block' : 'none';
+  if(filtered.length) populate360Teamlid();
+}
+
+function populate360Teamlid() {
+  const sel = document.getElementById('sup-teamlid');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Selecteer teamlid —</option>' +
+    filtered
+      .filter(r => r.naam && r.email && r.naam !== 'undefined')
+      .map(r=>`<option value="${r.email}">${r.naam} — ${r.team}</option>`).join('');
+  if(cur) sel.value = cur;
+}
+
+// ── BUILD INVUL FORM ──────────────────────────────────────────────
+function renderInvulForm() {
+  const email = document.getElementById('sup-teamlid').value;
+  const r = filtered.find(p=>p.email===email);
+  const form = document.getElementById('invul-form');
+  const ref  = document.getElementById('invul-reference');
+
+  if(!r) { form.innerHTML=''; ref.style.display='none'; return; }
+  ref.style.display = 'block';
+  sup360scores = {};
+
+  // Check if supervisor already rated this person
+  const existing = sup360data.find(s=>s.teamlid_email===email);
+  if(existing) {
+    ALL_SUBS.forEach(s=>{ sup360scores[s.id] = +existing[s.id+'_sup_score']||0; });
+  }
+
+  let html = '';
+  CATEGORIES.forEach(cat=>{
+    html += `<div class="cat-360-header"><span>${cat.icon}</span><span class="cat-360-title">${cat.label}</span></div>`;
+    html += `<div style="background:var(--white);border-radius:0 0 var(--radius) var(--radius);box-shadow:var(--shadow);margin-bottom:2px;overflow:hidden">`;
+    // Column headers
+    html += `<div class="sub-360-row" style="font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px">
+      <div class="col-header-360">Onderdeel</div>
+      <div class="col-header-360">Zelfscore medewerker</div>
+      <div class="col-header-360">Jouw beoordeling</div>
+      <div class="col-header-360" style="text-align:center">Gap</div>
+    </div>`;
+
+    cat.subs.forEach(sub=>{
+      const selfScore = +r[sub.id+'_score'] || 0;
+      const supScore  = sup360scores[sub.id] || 0;
+      const gap = supScore > 0 && selfScore > 0 ? supScore - selfScore : null;
+      const gapHtml = gap !== null
+        ? `<span class="gap-badge ${gap>0?'gap-pos':gap<0?'gap-neg':'gap-zero'}">${gap>0?'+':''}${gap}</span>`
+        : `<span style="color:var(--gray-300);font-size:11px">—</span>`;
+
+      const selfStars = Array.from({length:5},(_,i)=>
+        `<span class="ref-star${i<selfScore?' filled':''}" title="${STAR_LABELS[i+1]||''}">★</span>`
+      ).join('');
+
+      html += `<div class="sub-360-row" id="row360-${sub.id}">
+        <div class="sub-360-label">${sub.label}</div>
+        <div class="sub-360-self">
+          <div class="ref-stars">${selfStars}</div>
+          <span style="font-size:10px;color:var(--gray-400);margin-left:4px">${STAR_LABELS[selfScore]||'–'}</span>
+        </div>
+        <div class="sub-360-sup">
+          <div class="sup-stars" id="supstars-${sub.id}"></div>
+          <span class="star-label-text" id="suplabel-${sub.id}" style="font-size:10px;color:var(--gray-500);margin-left:4px">${STAR_LABELS[supScore]||''}</span>
+        </div>
+        <div class="sub-360-gap" id="supgap-${sub.id}">${gapHtml}</div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+
+  form.innerHTML = html;
+
+  // Build star buttons for each subcat
+  ALL_SUBS.forEach(sub=>{
+    const container = document.getElementById(`supstars-${sub.id}`);
+    if(!container) return;
+    const current = sup360scores[sub.id] || 0;
+    for(let i=1;i<=5;i++){
+      const btn = document.createElement('button');
+      btn.type='button'; btn.className='sup-star-btn'; btn.textContent='★'; btn.dataset.value=i;
+      if(i<=current) btn.classList.add('active');
+      btn.onclick = ()=>{
+        sup360scores[sub.id] = i;
+        // Refresh stars
+        container.querySelectorAll('.sup-star-btn').forEach(b=>b.classList.toggle('active',+b.dataset.value<=i));
+        document.getElementById(`suplabel-${sub.id}`).textContent = STAR_LABELS[i]||'';
+        // Update gap live
+        const selfScore = +filtered.find(p=>p.email===document.getElementById('sup-teamlid').value)?.[sub.id+'_score']||0;
+        const gap = i - selfScore;
+        const gapEl = document.getElementById(`supgap-${sub.id}`);
+        if(gapEl) gapEl.innerHTML = `<span class="gap-badge ${gap>0?'gap-pos':gap<0?'gap-neg':'gap-zero'}">${gap>0?'+':''}${gap}</span>`;
+      };
+      container.appendChild(btn);
+    }
+  });
+}
+
+// ── SAVE 360 ──────────────────────────────────────────────────────
+function save360() {
+  const email   = document.getElementById('sup-teamlid').value;
+  const supNaam = document.getElementById('sup-naam').value.trim();
+  const r       = filtered.find(p=>p.email===email);
+  if(!r)       { alert('Selecteer eerst een teamlid.'); return; }
+  if(!supNaam) { alert('Vul je naam in als supervisor.'); return; }
+
+  const row = {
+    sup_naam: supNaam,
+    teamlid_naam:  r.naam,
+    teamlid_email: r.email,
+    teamlid_team:  r.team,
+    timestamp: new Date().toLocaleString('nl-NL'),
+  };
+  ALL_SUBS.forEach(s=>{ row[s.id+'_sup_score'] = sup360scores[s.id]||0; });
+
+  // Store in memory
+  const idx = sup360data.findIndex(d=>d.teamlid_email===email);
+  if(idx>=0) sup360data[idx]=row; else sup360data.push(row);
+
+  // Download CSV
+  const bom = '\uFEFF';
+  const headers = Object.keys(row);
+  const values  = Object.values(row).map(v=>`"${String(v).replace(/"/g,'""')}"`);
+  dlText(bom+headers.join(';')+'\n'+values.join(';'),
+    `fabory_360_${r.naam.replace(/\s+/g,'_')}_${today()}.csv`, 'text/csv;charset=utf-8;');
+
+  alert(`360-beoordeling voor ${r.naam} opgeslagen en gedownload.`);
+  populateVergelijkSelect();
+}
+
+// ── LOAD 360 CSV ──────────────────────────────────────────────────
+function load360CSV(files) {
+  [...files].forEach(file=>{
+    const reader = new FileReader();
+    reader.onload = e=>{
+      let text = e.target.result;
+      // Strip BOM in all forms
+      text = text.replace(/^\uFEFF/, '').replace(/^\xEF\xBB\xBF/, '');
+      // Normalize line endings
+      const lines = text.trim().split(/\r?\n/);
+      if(lines.length < 2) return;
+
+      // Parse headers — handle quoted and unquoted
+      const parseCSVLine = line => {
+        const result = [];
+        let cur = '', inQ = false;
+        for(let i=0; i<line.length; i++){
+          const c = line[i];
+          if(c==='"'){ if(inQ && line[i+1]==='"'){cur+='"';i++;} else inQ=!inQ; }
+          else if(c===';' && !inQ){ result.push(cur.trim()); cur=''; }
+          else cur+=c;
+        }
+        result.push(cur.trim());
+        return result;
+      };
+
+      const headers = parseCSVLine(lines[0]);
+      const values  = parseCSVLine(lines[1]);
+      const row = {};
+      headers.forEach((h,i) => row[h] = values[i] || '');
+
+      // Validate: must have teamlid_email and at least one sup_score
+      if(!row.teamlid_email || row.teamlid_email === 'undefined') return;
+
+      const idx = sup360data.findIndex(d=>d.teamlid_email===row.teamlid_email);
+      if(idx>=0) sup360data[idx]=row; else sup360data.push(row);
+
+      populateVergelijkSelect();
+      populate360Teamlid();
+
+      // Show confirmation
+      const naam = row.teamlid_naam || row.teamlid_email;
+      console.log(`360 geladen: ${naam}`);
+
+      // Update import status bar
+      const statusEl = document.getElementById('360-import-status');
+      if(statusEl) statusEl.textContent = `✓ ${sup360data.length} beoordeling${sup360data.length!==1?'en':''} geladen`;
+    };
+    reader.readAsText(file, 'UTF-8');
+  });
+}
+
+// ── VERGELIJK ────────────────────────────────────────────────────
+function populateVergelijkSelect() {
+  const sel = document.getElementById('vergelijk-select');
+  if(!sel) return;
+  const cur = sel.value;
+  const source = (filtered && filtered.length) ? filtered : allData;
+  sel.innerHTML = '<option value="">— Selecteer medewerker —</option>' +
+    source
+      .filter(r => r.naam && r.email && r.naam !== 'undefined')
+      .map(r=>{
+        const has360 = sup360data.find(d=>d.naam&&d.naam.trim()===r.naam.trim());
+        return `<option value="${r.email}">${r.naam}${has360?' ✓':' (geen 360)'}</option>`;
+      }).join('');
+  if(cur) sel.value=cur;
+}
+
+function renderVergelijk() {
+  const email = document.getElementById('vergelijk-select').value;
+  const r     = filtered.find(p=>p.email===email);
+  const s360  = r ? sup360data.find(d=>d.naam&&d.naam.trim()===r.naam.trim()) : null;
+  const cont  = document.getElementById('vergelijk-content');
+
+  if(!r) { cont.innerHTML=''; return; }
+
+  // Summary KPIs
+  const allSelfScores = ALL_SUBS.map(s=>+r[s.id+'_score']||0).filter(v=>v>0);
+  const allSupScores  = s360 ? ALL_SUBS.map(s=>+s360[s.id]||0).filter(v=>v>0) : [];
+  const avgSelf = allSelfScores.length ? (allSelfScores.reduce((a,b)=>a+b)/allSelfScores.length).toFixed(1) : '–';
+  const avgSup  = allSupScores.length  ? (allSupScores.reduce((a,b)=>a+b)/allSupScores.length).toFixed(1) : '–';
+  const gaps    = s360 ? ALL_SUBS.map(s=>{
+    const self=+r[s.id+'_score']||0, sup=+s360[s.id]||0;
+    return (self>0&&sup>0) ? sup-self : null;
+  }).filter(g=>g!==null) : [];
+  const posGaps = gaps.filter(g=>g>0).length;
+  const negGaps = gaps.filter(g=>g<0).length;
+  const noGaps  = gaps.filter(g=>g===0).length;
+
+  let html = `
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px">
+    <div class="kpi-tile"><div class="kpi-label">Gem. Zelfscore</div><div class="kpi-value">${avgSelf}</div><div class="kpi-sub">van 5</div></div>
+    <div class="kpi-tile"><div class="kpi-label">Gem. Supervisorscore</div><div class="kpi-value" style="color:${s360?'#003070':'var(--gray-300)'}">
+      ${avgSup}</div><div class="kpi-sub">van 5</div></div>
+    <div class="kpi-tile green"><div class="kpi-label">Positieve gaps</div><div class="kpi-value" style="color:#2e7d32">${posGaps}</div><div class="kpi-sub">onderschatting</div></div>
+    <div class="kpi-tile red"><div class="kpi-label">Negatieve gaps</div><div class="kpi-value" style="color:var(--red)">${negGaps}</div><div class="kpi-sub">overschatting</div></div>
+    <div class="kpi-tile"><div class="kpi-label">Geen gap</div><div class="kpi-value">${noGaps}</div><div class="kpi-sub">scores gelijk</div></div>
+  </div>`;
+
+  if(!s360) {
+    html += `<div style="background:#fff8e1;border:1.5px solid #ff9800;border-radius:var(--radius);padding:14px 18px;font-size:13px;color:#555;margin-bottom:16px">
+      ⚠️ Nog geen 360-beoordeling beschikbaar voor <strong>${r.naam}</strong>. Vul deze in via het Invullen-tabblad of laad een 360-CSV.
+      <br><br><label style="font-size:12px;font-weight:600">360-CSV laden: </label>
+      <input type="file" accept=".csv" onchange="load360CSV(this.files);renderVergelijk()" style="font-size:12px">
+    </div>`;
+  }
+
+  // Per category comparison table
+  CATEGORIES.forEach(cat=>{
+    html += `<table class="vergelijk-table">
+      <thead><tr>
+        <th class="left" style="width:180px">${cat.icon} ${cat.label}</th>
+        <th>Zelfscore</th><th>Supervisor</th><th>Gap</th><th>Beoordeling</th>
+      </tr></thead><tbody>`;
+
+    cat.subs.forEach((sub,i)=>{
+      const self = +r[sub.id+'_score']||0;
+      const sup  = s360 ? +s360[sub.id]||0 : 0;
+      const gapRaw  = (self>0&&sup>0) ? sup-self : null;
+      const gap  = gapRaw !== null ? Math.round(gapRaw) : null;
+      const gapClass = gap===null?'':gap>0?'gap-pos-cell':gap<0?'gap-neg-cell':'gap-zero-cell';
+      const gapStr   = gap===null ? '–' : (gap>0?'+':'')+gap;
+      const stars     = v => v>0 ? ('★'.repeat(Math.round(v))+'☆'.repeat(5-Math.round(v))) : '–';
+      const selfClr   = self>0 ? scoreColor(self) : 'var(--gray-300)';
+      const supClr    = sup>0  ? scoreColor(sup)  : 'var(--gray-300)';
+
+      // Narrative label for gap
+      let beoordeling = '–';
+      if(gap!==null){
+        if(gap>=1.5)       beoordeling = '🟢 Sterke onderschatting';
+        else if(gap>=0.5)  beoordeling = '🟡 Lichte onderschatting';
+        else if(gap>-0.5)  beoordeling = '⚪ Score klopt';
+        else if(gap>=-1.5) beoordeling = '🟠 Lichte overschatting';
+        else               beoordeling = '🔴 Sterke overschatting';
+      }
+
+      html += `<tr style="background:${i%2===0?'white':'#fafafa'}">
+        <td class="name-col">${sub.label}</td>
+        <td><span style="color:${selfClr};font-size:13px">${stars(self)}</span><br><span style="font-size:9px;color:#999">${STAR_LABELS[self]||'–'}</span></td>
+        <td><span style="color:${supClr};font-size:13px">${stars(sup)}</span><br><span style="font-size:9px;color:#999">${STAR_LABELS[sup]||'–'}</span></td>
+        <td class="${gapClass}" style="font-size:14px;font-weight:700">${gapStr}</td>
+        <td style="font-size:11px">${beoordeling}</td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+  });
+
+  cont.innerHTML = html;
+}
+
+// ── 360 PDF ───────────────────────────────────────────────────────
+function export360PDF() {
+  const email = document.getElementById('vergelijk-select').value;
+  const r     = filtered.find(p=>p.email===email);
+  const s360  = r ? sup360data.find(d=>d.naam&&d.naam.trim()===r.naam.trim()) : null;
+  if(!r) return;
+
+  const datum  = new Date().toLocaleDateString('nl-NL');
+  const init   = (r.naam||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  const stars  = v => v>0?'★'.repeat(v)+'☆'.repeat(5-v):'–';
+  const sclr   = v => v>=4?'#2e7d32':v>=3?'#f9a825':v>=2?'#e65100':'#c8102e';
+  const gapClr = g => g===null?'#aaa':g>0?'#2e7d32':g<0?'#c8102e':'#777';
+  const gapBg  = g => g===null?'#f4f4f4':g>0?'#e8f5e9':g<0?'#fdeaed':'#f4f4f4';
+
+  const allSelfScores = ALL_SUBS.map(s=>+r[s.id+'_score']||0).filter(v=>v>0);
+  const allSupScores  = s360 ? ALL_SUBS.map(s=>+s360[s.id]||0).filter(v=>v>0) : [];
+  const avgSelf = allSelfScores.length?(allSelfScores.reduce((a,b)=>a+b)/allSelfScores.length).toFixed(1):'–';
+  const avgSup  = allSupScores.length?(allSupScores.reduce((a,b)=>a+b)/allSupScores.length).toFixed(1):'–';
+
+  let catRows = '';
+  CATEGORIES.forEach(cat=>{
+    catRows += `<tr><td colspan="5" style="background:#111;color:white;padding:6px 10px;font-weight:700;font-size:10px">${cat.icon} ${cat.label}</td></tr>`;
+    catRows += `<tr style="background:#eee"><td style="font-size:8px;font-weight:700;color:#777;padding:4px 10px">ONDERDEEL</td>
+      <td style="font-size:8px;font-weight:700;color:#777;padding:4px 8px">ZELF</td>
+      <td style="font-size:8px;font-weight:700;color:#777;padding:4px 8px">SUPERVISOR</td>
+      <td style="font-size:8px;font-weight:700;color:#777;padding:4px 8px">GAP</td>
+      <td style="font-size:8px;font-weight:700;color:#777;padding:4px 8px">BEOORDELING</td></tr>`;
+    cat.subs.forEach((sub,i)=>{
+      const self = +r[sub.id+'_score']||0;
+      const sup  = s360?+s360[sub.id+'_sup_score']||0:0;
+      const gap  = (self>0&&sup>0)?sup-self:null;
+      let beoordeling = '–';
+      if(gap!==null){
+        if(gap>=2)       beoordeling='Sterke onderschatting';
+        else if(gap===1) beoordeling='Lichte onderschatting';
+        else if(gap===0) beoordeling='Score klopt';
+        else if(gap===-1)beoordeling='Lichte overschatting';
+        else             beoordeling='Sterke overschatting';
+      }
+      catRows+=`<tr style="background:${i%2===0?'white':'#fafafa'}">
+        <td style="padding:5px 10px;font-size:9px;font-weight:600">${sub.label}</td>
+        <td style="padding:5px 8px;font-size:10px;color:${sclr(self)}">${stars(self)}</td>
+        <td style="padding:5px 8px;font-size:10px;color:${sclr(sup)}">${stars(sup)}</td>
+        <td style="padding:5px 8px;background:${gapBg(gap)};color:${gapClr(gap)};font-weight:700;font-size:12px;text-align:center">${gap===null?'–':(gap>0?'+':'')+gap}</td>
+        <td style="padding:5px 8px;font-size:8.5px;color:#555">${beoordeling}</td></tr>`;
+    });
+  });
+
+  const html=`<!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8">
+  <title>Fabory 360° Dossier – ${r.naam}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;font-size:10px;color:#111;background:white}
+    @media print{@page{size:A4;margin:15mm 18mm 18mm}body{print-color-adjust:exact;-webkit-print-color-adjust:exact}.page-break{page-break-before:always}.no-print{display:none}}
+    .page{max-width:210mm;margin:0 auto;padding:18px}
+    .dh{background:#111;color:white;padding:14px 18px;display:flex;align-items:center;gap:14px}
+    .logo{font-size:20px;font-weight:700;color:white}.logo span{color:#C8102E}
+    .hdiv{width:1px;height:22px;background:#444}.hsub{font-size:10px;color:#aaa;letter-spacing:.5px;text-transform:uppercase}
+    .rb{height:4px;background:#C8102E;margin-bottom:18px}
+    .av-row{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+    .av{width:48px;height:48px;border-radius:50%;background:#C8102E;color:white;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .cn{font-size:20px;font-weight:700}.cr{font-size:11px;color:#777;margin-top:2px}.cm{font-size:9px;color:#aaa;margin-top:3px}
+    .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}
+    .kpi{background:#f4f4f4;padding:10px 7px;text-align:center;border-radius:4px}
+    .kv{font-size:18px;font-weight:700;margin-bottom:3px}.kl{font-size:7.5px;text-transform:uppercase;letter-spacing:.4px;color:#777;font-weight:600}
+    .st{font-size:12px;font-weight:700;color:#C8102E;border-bottom:1.5px solid #C8102E;padding-bottom:3px;margin:16px 0 8px}
+    table{width:100%;border-collapse:collapse;font-size:9px}th{background:#eee;text-align:left;padding:4px 8px;font-size:8px;color:#777;text-transform:uppercase;letter-spacing:.3px}td{padding:4px 8px;border-bottom:.5px solid #eee;vertical-align:middle}
+    .df{font-size:7px;color:#aaa;text-align:center;margin-top:18px;padding-top:7px;border-top:.5px solid #ddd}
+    .no-print-bar{background:#111;color:white;padding:10px 18px;text-align:center;font-size:12px;position:fixed;top:0;left:0;right:0;z-index:999}
+    .no-print-bar button{background:#C8102E;color:white;border:none;padding:7px 18px;border-radius:4px;font-size:12px;cursor:pointer;margin-left:10px;font-weight:600}
+    .cw{margin-top:48px}@media print{.cw{margin-top:0}}
+    .leg{display:flex;gap:16px;margin-bottom:10px;flex-wrap:wrap}
+    .leg-item{display:flex;align-items:center;gap:5px;font-size:8.5px;color:#555}
+    .leg-dot{width:10px;height:10px;border-radius:2px}
+  
+/* DRAG & DROP */
+.drop-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:24px;text-align:center;color:var(--gray-500);font-size:13px;cursor:pointer;transition:all .2s;background:var(--white)}
+.drop-zone:hover,.drop-zone.dragover{border-color:#003087;background:#f0f4ff;color:#003087}
+.drop-zone .dz-icon{font-size:28px;margin-bottom:8px}
+.drop-zone input[type=file]{display:none}
+.drop-zone-label{font-weight:600;font-size:13px;color:#003087;cursor:pointer}
+.drop-zone-sub{font-size:11px;color:var(--gray-500);margin-top:4px}
+.import-status{font-size:12px;color:#2e7d32;font-weight:600;margin-top:8px;min-height:18px}
+
+/* 360 ANALYSIS */
+.dash-section-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px}
+.dash-section-tab{padding:10px 20px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--gray-500);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s}
+.dash-section-tab:hover{color:var(--black)}
+.dash-section-tab.active{color:#003087;border-bottom-color:#003087;font-weight:700}
+.analysis-360-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.kpi-360{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 16px;text-align:center}
+.kpi-360 .kv{font-size:28px;font-weight:700;margin-bottom:4px}
+.kpi-360 .kl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--gray-500)}
+.kpi-360 .ks{font-size:11px;color:var(--gray-500);margin-top:3px}
+.gap-table{width:100%;border-collapse:collapse;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.gap-table th{background:#111;color:white;padding:9px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;text-align:left}
+.gap-table td{padding:8px 12px;border-bottom:1px solid var(--gray-100);font-size:12px}
+.gap-table tr:last-child td{border-bottom:none}
+.gap-table tr:nth-child(even) td{background:#fafafa}
+.gap-pos{background:#e8f5e9;color:#2e7d32;font-weight:700;border-radius:3px;padding:2px 6px}
+.gap-neg{background:#fdeaed;color:#c8102e;font-weight:700;border-radius:3px;padding:2px 6px}
+.gap-zero{background:#f4f4f4;color:#777;border-radius:3px;padding:2px 6px}
+
+/* ── NIEUWE NAVIGATIE ── */
+.filter-bar{background:#fff;border-bottom:1px solid var(--border);padding:8px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:48px}
+.filter-label{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.4px;margin-right:4px}
+.team-btn{padding:5px 13px;border:1.5px solid var(--border);border-radius:20px;background:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:#666;cursor:pointer;transition:all .15s}
+.team-btn:hover{border-color:#003087;color:#003087}
+.team-btn.active{background:#003087;border-color:#003087;color:#fff;font-weight:600}
+.import-modal-btn{padding:6px 14px;border:1.5px solid #003087;border-radius:4px;background:#fff;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#003087;cursor:pointer;transition:all .15s;white-space:nowrap}
+.import-modal-btn:hover{background:#003087;color:#fff}
+.section-bar{background:#fff;border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center}
+.section-btn{padding:12px 20px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:#888;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s}
+.section-btn:hover{color:#003087}
+.section-btn.active{color:#003087;border-bottom-color:#003087;font-weight:700}
+.subtabs-bar{background:#fff;border-bottom:1px solid var(--border);padding:6px 16px;display:flex;align-items:center;gap:4px}
+.tab-btn{padding:7px 14px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:#888;cursor:pointer;border-radius:4px;transition:all .15s}
+.tab-btn:hover{background:#f0f4ff;color:#003087}
+.tab-btn.active{background:#003087;color:#fff;font-weight:600}
+/* ── MODALS ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.visible{display:flex}
+.modal-box{background:#fff;border-radius:8px;padding:28px;width:460px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:16px;color:#003087;display:flex;align-items:center;gap:8px}
+.modal-close{margin-left:auto;border:none;background:none;font-size:22px;cursor:pointer;color:#888;line-height:1;padding:0}
+.modal-close:hover{color:#111}
+.modal-drop-zone{border:2px dashed #003087;border-radius:6px;padding:28px;text-align:center;cursor:pointer;background:#f8fafd;transition:all .2s}
+.modal-drop-zone:hover,.modal-drop-zone.dragover{background:#e8f2fa}
+
+
+/* ── 360 FORMULIER ── */
+.s360-setup-card{background:#fff;border-radius:6px;box-shadow:0 2px 12px rgba(0,0,0,.08);padding:20px;margin-bottom:12px}
+.s360-card{background:#fff;border-radius:6px;box-shadow:0 2px 12px rgba(0,0,0,.08);overflow:hidden;margin-bottom:12px}
+.s360-cat-hdr{padding:10px 16px;display:flex;align-items:center;gap:8px;color:#fff;font-size:14px;font-weight:600}
+.s360-row{display:flex;align-items:center;padding:9px 16px;border-bottom:1px solid #f0f0f0;gap:8px}
+.s360-row:last-child{border-bottom:none}
+.s360-row:nth-child(even){background:#fafafa}
+.s360-label{flex:1;font-size:12px;color:#333;font-weight:500}
+.s360-self{font-size:10px;white-space:nowrap;min-width:50px;text-align:right}
+.s360-stars{display:flex;gap:2px}
+.s360-star{background:none;border:none;font-size:19px;cursor:pointer;color:#ddd;padding:1px;line-height:1;transition:color .1s}
+.s360-star.active{color:#f5a623}
+.s360-field-label{font-size:10px;font-weight:700;color:#777;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px}
+.s360-select,.s360-input{width:100%;padding:8px 10px;border:1.5px solid #e0e0e0;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:13px}
+.s360-submit-btn{background:#003087;color:#fff;border:none;padding:12px 36px;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s}
+.s360-submit-btn:hover{background:#002060}
+.s360-submit-btn:disabled{background:#ccc;cursor:not-allowed}
+/* gap table */
+.gap-tbl{width:100%;border-collapse:collapse;background:#fff;border-radius:6px;box-shadow:0 2px 12px rgba(0,0,0,.08);overflow:hidden;margin-bottom:16px}
+.gap-tbl th{background:#111;color:#fff;padding:9px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;text-align:left}
+.gap-tbl td{padding:8px 12px;border-bottom:1px solid #f0f0f0;font-size:12px}
+.gap-tbl tr:last-child td{border-bottom:none}
+.gap-pos{background:#e8f5e9;color:#2e7d32;font-weight:700;border-radius:3px;padding:2px 6px}
+.gap-neg{background:#fdeaed;color:#c8102e;font-weight:700;border-radius:3px;padding:2px 6px}
+.gap-zero{background:#f4f4f4;color:#777;border-radius:3px;padding:2px 6px}
+.kpi360-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px}
+.kpi360{background:#fff;border-radius:6px;box-shadow:0 2px 12px rgba(0,0,0,.08);padding:16px;text-align:center}
+.kpi360-val{font-size:26px;font-weight:700;margin-bottom:2px}
+.kpi360-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#777}
+.kpi360-sub{font-size:11px;color:#999;margin-top:2px}
+
+</style></head><body>
+  <div class="no-print-bar no-print">📄 Fabory 360° Dossier – ${r.naam}
+    <button onclick="window.print()">🖨 Opslaan als PDF</button>
+    <button onclick="window.close()" style="background:#333;margin-left:8px">✕ Sluiten</button>
+  </div>
+  <div class="cw"><div class="page">
+    <div class="dh"><div class="logo">F<span>.</span></div><div class="hdiv"></div><div class="hsub">Inside Sales · 360° Beoordelingsdossier</div></div>
+    <div class="rb"></div>
+    <div class="av-row">
+      <div class="av">${init}</div>
+      <div>
+        <div class="cn">${r.naam}</div>
+        <div class="cr">${r.rol} · ${r.team}</div>
+        <div class="cm">Gegenereerd: ${datum}${s360?` · Supervisor: ${s360.sup_naam}`:' · Geen supervisorbeoordeling beschikbaar'}</div>
+      </div>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi"><div class="kv">${avgSelf}</div><div class="kl">Gem. Zelfscore</div></div>
+      <div class="kpi"><div class="kv" style="color:#003070">${avgSup}</div><div class="kl">Gem. Supervisorscore</div></div>
+      <div class="kpi"><div class="kv" style="color:#2e7d32">${s360?ALL_SUBS.filter(s=>{const g=(+s360[s.id+'_sup_score']||0)-(+r[s.id+'_score']||0);return g>0&&(+r[s.id+'_score']||0)>0&&(+s360[s.id+'_sup_score']||0)>0}).length:'–'}</div><div class="kl">Positieve gaps</div></div>
+      <div class="kpi"><div class="kv" style="color:#c8102e">${s360?ALL_SUBS.filter(s=>{const g=(+s360[s.id+'_sup_score']||0)-(+r[s.id+'_score']||0);return g<0&&(+r[s.id+'_score']||0)>0&&(+s360[s.id+'_sup_score']||0)>0}).length:'–'}</div><div class="kl">Negatieve gaps</div></div>
+      <div class="kpi"><div class="kv">${r.urgentie||'–'}</div><div class="kl">Urgentie training</div></div>
+    </div>
+    <div class="leg">
+      <div class="leg-item"><div class="leg-dot" style="background:#e8f5e9;border:1px solid #4caf50"></div>Positief gap — supervisor hoger (onderschatting)</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#fdeaed;border:1px solid #c8102e"></div>Negatief gap — medewerker hoger (overschatting)</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#f4f4f4;border:1px solid #ccc"></div>Geen gap</div>
+    </div>
+    <div class="st">Vergelijking per onderdeel</div>
+    <table>${catRows}</table>
+    <div class="df">Fabory · 360° Beoordelingsdossier · ${r.naam} · Vertrouwelijk</div>
+  </div></div></body></html>`;
+
+  const w=window.open('','_blank');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(()=>w.print(),700);
+}
+
+function export360CSV() {
+  const email = document.getElementById('vergelijk-select').value;
+  const r     = filtered.find(p=>p.email===email);
+  const s360  = r ? sup360data.find(d=>d.naam&&d.naam.trim()===r.naam.trim()) : null;
+  if(!r) return;
+  const row = { naam:r.naam, email:r.email, team:r.team };
+  ALL_SUBS.forEach(s=>{
+    row[s.id+'_self'] = +r[s.id+'_score']||0;
+    row[s.id+'_sup']  = s360?+s360[s.id+'_sup_score']||0:0;
+    row[s.id+'_gap']  = (row[s.id+'_self']>0&&row[s.id+'_sup']>0)?row[s.id+'_sup']-row[s.id+'_self']:'';
+  });
+  const bom='\uFEFF';
+  const h=Object.keys(row);
+  dlText(bom+h.join(';')+'\n'+h.map(k=>`"${(row[k]||'').toString().replace(/"/g,'""')}"`).join(';'),
+    `fabory_360_vergelijk_${r.naam.replace(/\s+/g,'_')}_${today()}.csv`,'text/csv;charset=utf-8;');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+loadData();
+// ── DRAG & DROP ────────────────────────────────────────────────
+function handleDrop(e, type) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+  handleFileInput(e.dataTransfer.files, type);
+}
+
+function handleFileInput(files, type) {
+  if(!files || files.length === 0) return;
+  [...files].forEach(file => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      let text = ev.target.result.replace(/^\uFEFF/, '');
+      const lines = text.trim().split(/\r?\n/);
+      if(lines.length < 2) return;
+      const parseCSVLine = line => {
+        const result = []; let cur = '', inQ = false;
+        for(let i=0;i<line.length;i++){
+          const c=line[i];
+          if(c==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
+          else if((c===';'||c===',')&&!inQ){result.push(cur.trim());cur='';}
+          else cur+=c;
+        }
+        result.push(cur.trim()); return result;
+      };
+      const headers = parseCSVLine(lines[0]);
+      // Read ALL data rows (not just first)
+      for(let li = 1; li < lines.length; li++) {
+        if(!lines[li].trim()) continue;
+        const values = parseCSVLine(lines[li]);
+        const row = {}; headers.forEach((h,i)=>row[h]=values[i]||'');
+        if(type === 'enquete') {
+          if(!row.naam || !row.email) continue;
+          const idx = allData.findIndex(r=>r.email===row.email);
+          if(idx>=0) allData[idx]=row; else allData.push(row);
+        } else if(type === '360') {
+          if(!row.teamlid_email) continue;
+          const idx = sup360data.findIndex(d=>d.teamlid_email===row.teamlid_email);
+          if(idx>=0) sup360data[idx]=row; else sup360data.push(row);
+          save360ToStorage();
+        }
+      }
+      // Update status in both modal and inline
+      const msg = type==='enquete'
+        ? `✓ ${allData.length} medewerker${allData.length!==1?'s':''} geladen`
+        : `✓ ${sup360data.length} beoordeling${sup360data.length!==1?'en':''} geladen`;
+      ['enqueteStatus','modalEnqueteStatus'].forEach(id=>{const el=document.getElementById(id);if(el&&type==='enquete')el.textContent=msg;});
+      ['status360','modal360Status'].forEach(id=>{const el=document.getElementById(id);if(el&&type==='360')el.textContent=msg;});
+      if(type==='enquete') applyFilter();
+      if(type==='360' && typeof populate360Select==='function') populate360Select();
+    };
+    reader.readAsText(file, 'UTF-8');
+  });
+}
+
+// ── DASHBOARD SECTION SWITCH ───────────────────────────────────
+// ── 360 ANALYSIS ──────────────────────────────────────────────
+function render360Analysis() {
+  const wrap = document.getElementById('wrap-360-analysis');
+  if(!wrap) return;
+  if(!sup360data.length) {
+    wrap.innerHTML = '<div style="text-align:center;padding:60px;color:var(--gray-500)"><div style="font-size:40px;margin-bottom:12px">🔄</div><h3>Nog geen 360-beoordelingen geladen</h3><p style="margin-top:8px;font-size:13px">Sleep de 360-CSV bestanden in het importvak hierboven.</p></div>';
+    return;
+  }
+  const matched   = sup360data.map(s360=>({s360,self:allData.find(r=>r.email===s360.teamlid_email)})).filter(m=>m.self);
+  const unmatched = sup360data.filter(s=>!allData.find(r=>r.email===s.teamlid_email));
+  let totalPos=0,totalNeg=0,totalZero=0,totalGaps=0,selfScores=[],supScores=[];
+  matched.forEach(({s360,self})=>{
+    ALL_SUBS.forEach(sub=>{
+      const sv=+self[sub.id+'_score']||0, spv=+s360[sub.id+'_sup_score']||0;
+      if(sv>0&&spv>0){
+        const gap=spv-sv; selfScores.push(sv); supScores.push(spv); totalGaps++;
+        if(gap>0)totalPos++; else if(gap<0)totalNeg++; else totalZero++;
+      }
+    });
+  });
+  const avgSelf = selfScores.length?(selfScores.reduce((a,b)=>a+b)/selfScores.length).toFixed(1):'–';
+  const avgSup  = supScores.length?(supScores.reduce((a,b)=>a+b)/supScores.length).toFixed(1):'–';
+  const pctPos  = totalGaps?Math.round(totalPos/totalGaps*100):0;
+  const pctNeg  = totalGaps?Math.round(totalNeg/totalGaps*100):0;
+  let catRows='';
+  CATEGORIES.forEach(cat=>{
+    let cSelf=0,cSup=0,cPos=0,cNeg=0,cZero=0,n=0;
+    cat.subs.forEach(sub=>{
+      matched.forEach(({s360,self})=>{
+        const sv=+self[sub.id+'_score']||0,spv=+s360[sub.id+'_sup_score']||0;
+        if(sv>0&&spv>0){cSelf+=sv;cSup+=spv;n++;const g=spv-sv;if(g>0)cPos++;else if(g<0)cNeg++;else cZero++;}
+      });
+    });
+    if(!n) return;
+    const ag=((cSup-cSelf)/n).toFixed(1);
+    const gc=+ag>0?'gap-pos':+ag<0?'gap-neg':'gap-zero';
+    catRows+=`<tr><td><strong>${cat.icon} ${cat.label}</strong></td>
+      <td style="text-align:center">${(cSelf/n).toFixed(1)}</td>
+      <td style="text-align:center">${(cSup/n).toFixed(1)}</td>
+      <td style="text-align:center"><span class="${gc}">${+ag>0?'+':''}${ag}</span></td>
+      <td style="text-align:center;font-size:11px">🟢${cPos} 🔴${cNeg} ⚪${cZero}</td></tr>`;
+  });
+  let personRows='';
+  matched.forEach(({s360,self})=>{
+    const gaps=ALL_SUBS.map(sub=>{const sv=+self[sub.id+'_score']||0,spv=+s360[sub.id+'_sup_score']||0;return(sv>0&&spv>0)?spv-sv:null;}).filter(g=>g!==null);
+    const pos=gaps.filter(g=>g>0).length,neg=gaps.filter(g=>g<0).length,eq=gaps.filter(g=>g===0).length;
+    personRows+=`<tr>
+      <td><strong>${self.naam}</strong><br><span style="font-size:10px;color:#999">${self.team}</span></td>
+      <td style="text-align:center">${self.zekerheid_score||'–'}/5</td>
+      <td style="text-align:center">${s360.sup_naam||'–'}</td>
+      <td style="text-align:center"><span class="gap-pos">🟢 ${pos}</span></td>
+      <td style="text-align:center"><span class="gap-neg">🔴 ${neg}</span></td>
+      <td style="text-align:center"><span class="gap-zero">⚪ ${eq}</span></td></tr>`;
+  });
+  wrap.innerHTML = `
+    <div class="analysis-360-grid">
+      <div class="kpi-360"><div class="kv" style="color:#003087">${matched.length}</div><div class="kl">Beoordeeld</div><div class="ks">medewerkers met 360</div></div>
+      <div class="kpi-360"><div class="kv">${avgSelf}</div><div class="kl">Gem. Zelfscore</div><div class="ks">van 5</div></div>
+      <div class="kpi-360"><div class="kv" style="color:#003087">${avgSup}</div><div class="kl">Gem. Supervisorscore</div><div class="ks">van 5</div></div>
+      <div class="kpi-360"><div class="kv" style="color:#2e7d32">${totalPos}</div><div class="kl">Positieve gaps</div><div class="ks">${pctPos}% onderschatting</div></div>
+      <div class="kpi-360"><div class="kv" style="color:#c8102e">${totalNeg}</div><div class="kl">Negatieve gaps</div><div class="ks">${pctNeg}% overschatting</div></div>
+      <div class="kpi-360"><div class="kv">${totalZero}</div><div class="kl">Geen gap</div><div class="ks">scores kloppen</div></div>
+    </div>
+    <h3 style="margin-bottom:12px;font-size:14px;font-weight:700">Gap-analyse per categorie</h3>
+    <table class="gap-table"><thead><tr>
+      <th>Categorie</th><th style="text-align:center">Gem. Zelf</th><th style="text-align:center">Gem. Supervisor</th>
+      <th style="text-align:center">Gem. Gap</th><th style="text-align:center">Verdeling</th>
+    </tr></thead><tbody>${catRows}</tbody></table>
+    <h3 style="margin-bottom:12px;font-size:14px;font-weight:700;margin-top:20px">Overzicht per medewerker</h3>
+    <table class="gap-table"><thead><tr>
+      <th>Medewerker</th><th style="text-align:center">Zekerheid</th><th style="text-align:center">Supervisor</th>
+      <th style="text-align:center">Positief</th><th style="text-align:center">Negatief</th><th style="text-align:center">Gelijk</th>
+    </tr></thead><tbody>${personRows}</tbody></table>
+    ${unmatched.length?`<div style="background:#fff8e1;border:1px solid #ff9800;border-radius:6px;padding:10px 14px;font-size:12px;color:#555;margin-top:12px">
+      ⚠️ ${unmatched.length} 360-beoordeling${unmatched.length>1?'en':''} zonder enquête: ${unmatched.map(s=>s.naam).join(', ')}
+    </div>`:''}`;
+}
+
+// ── LOCALSTORAGE ──────────────────────────────────────────────────
+function handleFiles(files, type) {
+  handleFileInput(files, type);
+  setTimeout(() => {
+    const modal = document.getElementById(type==='enquete'?'modalEnquete':'modal360');
+    if(modal) setTimeout(()=>modal.classList.remove('visible'), 1500);
+  }, 100);
+}
+
+// ── 360 N8N OPSLAG ────────────────────────────────────────────────
+const ALL_SUBS_360 = ['mif_productkennis_f','mif_productkennis_nf','mif_marktkennis','mif_prijsopbouw','mif_oem_mro','mif_service','sap_orders','sap_quotations','sap_inquiries','sap_customer_info','sap_article_info','sap_cust_mgmt','sap_logic','sap_contracts','sap_quality','sap_invoicing','sap_purchase','sap_pricing','sap_tsc_logistics','sap_tsc_inventory','sap_queries','c4c_algemeen','c4c_tickets','c4c_tasks','c4c_opportunity','proc_local','proc_pricing','proc_logic','proc_sales','proc_creditmanagement','proc_operations','dig_webservices','dig_eprocure','dig_m365'];
+const CATS_360 = [
+  {id:'mif',label:'Masters in Fasteners',icon:'🏆',subs:['mif_productkennis_f','mif_productkennis_nf','mif_marktkennis','mif_prijsopbouw','mif_oem_mro','mif_service']},
+  {id:'sap',label:'SAP',icon:'🗄️',subs:['sap_orders','sap_quotations','sap_inquiries','sap_customer_info','sap_article_info','sap_cust_mgmt','sap_logic','sap_contracts','sap_quality','sap_invoicing','sap_purchase','sap_pricing','sap_tsc_logistics','sap_tsc_inventory','sap_queries']},
+  {id:'c4c',label:'C4C',icon:'💬',subs:['c4c_algemeen','c4c_tickets','c4c_tasks','c4c_opportunity']},
+  {id:'processen',label:'Processen',icon:'⚙️',subs:['proc_local','proc_pricing','proc_logic','proc_sales','proc_creditmanagement','proc_operations']},
+  {id:'digital',label:'Digital',icon:'🌐',subs:['dig_webservices','dig_eprocure','dig_m365']},
+];
+// Self-score mapping: compute aggregates from enquête data
+function getSelfScore(member, field) {
+  const avg = (...keys) => { const vals=keys.map(k=>+member[k]||0).filter(v=>v>0); return vals.length?(vals.reduce((a,b)=>a+b)/vals.length):0; };
+  if(field==='mif') return avg('mif_productkennis_f_score','mif_productkennis_nf_score','mif_marktkennis_score','mif_prijsopbouw_score','mif_oem_mro_score','mif_service_score');
+  if(field==='c4c') return avg('c4c_algemeen_score','c4c_tickets_score','c4c_tasks_score','c4c_opportunity_score');
+  if(field==='processen') return avg('proc_local_score','proc_pricing_score','proc_logic_score','proc_sales_score','proc_creditmanagement_score','proc_operations_score');
+  if(field==='digital') return avg('dig_webservices_score','dig_eprocure_score','dig_m365_score');
+  return +member[field+'_score']||0; // SAP groups: direct match
+}
+function get360Score(s360, subId) {
+  if(!s360) return 0;
+  return +s360[subId]||0;
+}
+let scores360 = {};
+
+async function load360FromN8N() {
+  try {
+    const resp = await fetch(N8N_360_GET_URL, { method:'GET', headers:{'Accept':'application/json'} });
+    if (!resp.ok) throw new Error('360 GET failed');
+    const rows = await resp.json();
+    if (Array.isArray(rows)) {
+      sup360data = rows.map(r => r.json && typeof r.json==='object' ? r.json : r).filter(r => r && r.naam);
+    }
+  } catch(e) {
+    console.warn('360 load failed:', e);
+  }
+}
+
+async function save360ToN8N(record) {
+  const resp = await fetch(N8N_360_POST_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ data: record })
+  });
+  if (!resp.ok) throw new Error('360 POST failed');
+}
+function populate360Select() {
+  const sel=document.getElementById('sel360Teamlid'); if(!sel) return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">-- Selecteer teamlid --</option>';
+  allData.forEach(r=>{if(!r.naam||!r.email)return;const o=document.createElement('option');o.value=r.email;o.textContent=r.naam+' ('+r.team+')';sel.appendChild(o);});
+  if(cur) sel.value=cur;
+}
+function load360SelfScores() {
+  const email=document.getElementById('sel360Teamlid').value;
+  if(!email){document.getElementById('form360Fields').style.display='none';return;}
+  const member=allData.find(r=>r.email===email); if(!member) return;
+  scores360={};
+  ALL_SUBS_360.forEach(sub=>{
+    scores360[sub]=0;
+    const refEl=document.getElementById('s360ref-'+sub);
+    if(refEl){const sv=+member[sub+'_score']||0;refEl.textContent=sv?'Zelf: '+sv+'★':'';refEl.style.color=sv<=2?'#c8102e':sv>=4?'#2e7d32':'#f57c00';}
+    const ex=sup360data.find(d=>d.naam===member.naam);
+    if(ex) scores360[sub]=+ex[sub]||0;
+    refresh360Stars(sub,scores360[sub]);
+  });
+  document.getElementById('form360Fields').style.display='block';
+  document.getElementById('form360Status').textContent='';
+  const ex=sup360data.find(d=>d.naam===member.naam);
+  if(ex){
+    if(ex.supervisor) document.getElementById('sup360Naam').value=ex.supervisor;
+    if(ex.algemene_opmerking) document.getElementById('sup360Opmerking').value=ex.algemene_opmerking;
+  }
+}
+function set360Star(btn) {
+  scores360[btn.dataset.sub]=+btn.dataset.val; refresh360Stars(btn.dataset.sub,+btn.dataset.val);
+}
+function refresh360Stars(sub,val) {
+  const c=document.getElementById('s360-'+sub); if(!c) return;
+  c.querySelectorAll('.s360-star').forEach(b=>b.classList.toggle('active',+b.dataset.val<=val));
+}
+async function submit360() {
+  const email=document.getElementById('sel360Teamlid').value;
+  const supNaam=document.getElementById('sup360Naam').value.trim();
+  const supEmail=document.getElementById('sup360Email').value.trim();
+  if(!email||!supNaam){alert('Vul alle verplichte velden in.');return;}
+  const member=allData.find(r=>r.email===email); if(!member) return;
+  const btn=document.querySelector('.s360-submit-btn'); if(btn) btn.disabled=true;
+  document.getElementById('form360Status').textContent='Opslaan...';
+  const record={naam:member.naam,supervisor:supNaam,team:member.team,datum:new Date().toLocaleString('nl-NL'),algemene_opmerking:document.getElementById('sup360Opmerking').value.trim()};
+  ALL_SUBS_360.forEach(sub=>{record[sub]=String(scores360[sub]||0);});
+  try {
+    await save360ToN8N(record);
+    const idx=sup360data.findIndex(d=>d.naam===member.naam);
+    if(idx>=0) sup360data[idx]=record; else sup360data.push(record);
+    document.getElementById('form360Status').textContent='✓ Beoordeling van '+member.naam+' opgeslagen!';
+    if(btn) btn.disabled=false;
+    setTimeout(()=>{
+      document.getElementById('sel360Teamlid').value='';
+      document.getElementById('form360Fields').style.display='none';
+      document.getElementById('form360Status').textContent='';
+      document.getElementById('sup360Opmerking').value='';
+      scores360={};
+    },2000);
+  } catch(e) {
+    console.error('360 save error:', e);
+    document.getElementById('form360Status').textContent='⚠ Opslaan mislukt: '+e.message+'. Probeer opnieuw.';
+    if(btn) btn.disabled=false;
+  }
+}
+function render360Analysis() {
+  const wrap=document.getElementById('analyse360Content'); if(!wrap) return;
+  if(!sup360data.length){wrap.innerHTML='<div style="text-align:center;padding:60px;color:#777"><div style="font-size:40px;margin-bottom:12px">📊</div><h3>Nog geen 360-beoordelingen</h3><p style="margin-top:8px;font-size:13px">Vul eerst beoordelingen in via "Beoordeling invullen".</p></div>';return;}
+  const matched=sup360data.map(s360=>({s360,self:allData.find(r=>(r.naam||'').trim()===s360.naam.trim())})).filter(m=>m.self);
+  if(!matched.length){wrap.innerHTML='<div style="text-align:center;padding:40px;color:#777">Geen overeenkomende enquête-data.</div>';return;}
+  let tp=0,tn=0,tz=0,tg=0,ss=[],sp=[];
+  matched.forEach(({s360,self})=>{ALL_SUBS_360.forEach(sub=>{const sv=+self[sub+'_score']||0,spv=+s360[sub]||0;if(sv>0&&spv>0){const g=spv-sv;ss.push(sv);sp.push(spv);tg++;if(g>0)tp++;else if(g<0)tn++;else tz++;}});});
+  const avgS=ss.length?(ss.reduce((a,b)=>a+b)/ss.length).toFixed(1):'–';
+  const avgP=sp.length?(sp.reduce((a,b)=>a+b)/sp.length).toFixed(1):'–';
+  let catRows='';
+  CATS_360.forEach(cat=>{
+    let cs=0,cp=0,n=0,pos=0,neg=0,zero=0;
+    cat.subs.forEach(sub=>{matched.forEach(({s360,self})=>{const sv=+self[sub+'_score']||0,spv=+s360[sub]||0;if(sv>0&&spv>0){cs+=sv;cp+=spv;n++;const g=spv-sv;if(g>0)pos++;else if(g<0)neg++;else zero++;}});});
+    if(!n) return;
+    const ag=((cp-cs)/n).toFixed(1),gc=+ag>0?'gap-pos':+ag<0?'gap-neg':'gap-zero';
+    catRows+=`<tr><td><strong>${cat.icon} ${cat.label}</strong></td><td style="text-align:center">${(cs/n).toFixed(1)}</td><td style="text-align:center">${(cp/n).toFixed(1)}</td><td style="text-align:center"><span class="${gc}">${+ag>0?'+':''}${ag}</span></td><td style="text-align:center;font-size:11px">🟢${pos} 🔴${neg} ⚪${zero}</td></tr>`;
+  });
+  let personRows='';
+  matched.forEach(({s360,self})=>{
+    const gaps=ALL_SUBS_360.map(sub=>{const sv=+self[sub+'_score']||0,spv=+s360[sub]||0;return(sv>0&&spv>0)?spv-sv:null;}).filter(g=>g!==null);
+    const pos=gaps.filter(g=>g>0).length,neg=gaps.filter(g=>g<0).length,eq=gaps.filter(g=>g===0).length;
+    personRows+=`<tr><td><strong>${self.naam}</strong><br><span style="font-size:10px;color:#999">${self.team}</span></td><td style="text-align:center">${self.zekerheid_score||'–'}/5</td><td style="text-align:center">${s360.supervisor||'–'}</td><td style="text-align:center"><span class="gap-pos">🟢 ${pos}</span></td><td style="text-align:center"><span class="gap-neg">🔴 ${neg}</span></td><td style="text-align:center"><span class="gap-zero">⚪ ${eq}</span></td></tr>`;
+  });
+  wrap.innerHTML=`<div class="kpi360-grid"><div class="kpi360"><div class="kpi360-val" style="color:#003087">${matched.length}</div><div class="kpi360-lbl">Beoordeeld</div></div><div class="kpi360"><div class="kpi360-val">${avgS}</div><div class="kpi360-lbl">Gem. Zelfscore</div></div><div class="kpi360"><div class="kpi360-val" style="color:#003087">${avgP}</div><div class="kpi360-lbl">Gem. Supervisorscore</div></div><div class="kpi360"><div class="kpi360-val" style="color:#2e7d32">${tp}</div><div class="kpi360-lbl">🟢 Onderschat</div><div class="kpi360-sub">${tg?Math.round(tp/tg*100):0}%</div></div><div class="kpi360"><div class="kpi360-val" style="color:#c8102e">${tn}</div><div class="kpi360-lbl">🔴 Overschat</div><div class="kpi360-sub">${tg?Math.round(tn/tg*100):0}%</div></div><div class="kpi360"><div class="kpi360-val">${tz}</div><div class="kpi360-lbl">⚪ Gelijk</div></div></div>
+    <h3 style="margin-bottom:10px;font-size:14px;font-weight:700">Gap per categorie</h3>
+    <table class="gap-tbl"><thead><tr><th>Categorie</th><th style="text-align:center">Gem. Zelf</th><th style="text-align:center">Gem. Supervisor</th><th style="text-align:center">Gem. Gap</th><th style="text-align:center">Verdeling</th></tr></thead><tbody>${catRows}</tbody></table>
+    <h3 style="margin:16px 0 10px;font-size:14px;font-weight:700">Overzicht per medewerker</h3>
+    <table class="gap-tbl"><thead><tr><th>Medewerker</th><th style="text-align:center">Zekerheid</th><th style="text-align:center">Supervisor</th><th style="text-align:center">🟢</th><th style="text-align:center">🔴</th><th style="text-align:center">⚪</th></tr></thead><tbody>${personRows}</tbody></table>`;
+}
+function export360CSV() {
+  if(!sup360data.length){alert('Geen 360-data.');return;}
+  const h=Object.keys(sup360data[0]),rows=sup360data.map(r=>h.map(k=>'"'+String(r[k]||'').replace(/"/g,'""')+'"').join(','));
+  const csv='\ufeff'+h.join(',')+'\n'+rows.join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='fabory_360_export.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+function switch360Tab(tab,btn) {
+  document.querySelectorAll('#tabs360 .tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  ['invullen','collectief','persoon'].forEach(t => {
+    const el = document.getElementById('tab-360-'+t);
+    if(el) el.style.display = (t===tab)?'block':'none';
+  });
+  if(tab==='collectief') render360Analysis();
+  if(tab==='persoon') populateVergelijkSelect();
+}
+function switchDashSection(section,btn) {
+  document.querySelectorAll('.section-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const isEigen=section==='eigen', is360=section==='360', isVG=section==='voortgang';
+  document.getElementById('eigenTabs').style.display=isEigen?'flex':'none';
+  document.getElementById('tabs360').style.display=is360?'flex':'none';
+  document.getElementById('main-content-wrap').style.display=isEigen?'block':'none';
+  const w360=document.getElementById('wrap-360-analysis');
+  const wVG=document.getElementById('wrap-voortgang');
+  if(w360) w360.style.display=is360?'block':'none';
+  if(wVG)  wVG.style.display=isVG?'block':'none';
+  if(is360){
+    populate360Select();
+    ['invullen','collectief','persoon'].forEach(t=>{
+      const el=document.getElementById('tab-360-'+t);
+      if(el) el.style.display=t==='invullen'?'block':'none';
+    });
+    document.querySelectorAll('#tabs360 .tab-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+  }
+  if(isVG) renderVoortgang();
+}
+
+// ── VOORTGANG ──────────────────────────────────────────────────────
+function renderVoortgang() {
+  const filledNames = new Set(allData.map(r=>(r.naam||'').trim().toLowerCase()));
+  const teamOrder = ['Noord Oost NL','West NL','Zuid NL','National Accounts','Petro'];
+  let totalAll=0, doneAll=0;
+  teamOrder.forEach(team=>{ const m=TEAM_MEMBERS[team]||[]; totalAll+=m.length; doneAll+=m.filter(n=>filledNames.has(n.toLowerCase())).length; });
+
+  // KPI row
+  const pct = totalAll ? Math.round(doneAll/totalAll*100) : 0;
+  document.getElementById('vg-kpi-row').innerHTML = `
+    <div class="vg-kpi"><div class="vg-kpi-val" style="color:#003087">${doneAll}</div><div class="vg-kpi-lbl">Ingevuld</div></div>
+    <div class="vg-kpi"><div class="vg-kpi-val" style="color:#c8102e">${totalAll-doneAll}</div><div class="vg-kpi-lbl">Nog open</div></div>
+    <div class="vg-kpi"><div class="vg-kpi-val" style="color:#f5a623">${totalAll}</div><div class="vg-kpi-lbl">Totaal</div></div>
+    <div class="vg-kpi"><div class="vg-kpi-val" style="color:${pct>=80?'#2e7d32':pct>=50?'#f57c00':'#c8102e'}">${pct}%</div><div class="vg-kpi-lbl">Respons</div></div>`;
+
+  // Team cards
+  document.getElementById('vg-team-cards').innerHTML = teamOrder.map(team => {
+    const members = TEAM_MEMBERS[team] || [];
+    const done = members.filter(n => filledNames.has(n.toLowerCase())).length;
+    const pctTeam = members.length ? Math.round(done/members.length*100) : 0;
+    const names = members.map(n => {
+      const isDone = filledNames.has(n.toLowerCase());
+      const rec = isDone ? allData.find(r=>(r.naam||'').trim().toLowerCase()===n.toLowerCase()) : null;
+      const datum = rec && rec.timestamp ? ' <span style="font-size:10px;color:#999">'+rec.timestamp.split(' ')[0]+'</span>' : '';
+      return `<div class="vg-name-item ${isDone?'done':'todo'}"><span class="vg-dot ${isDone?'done':'todo'}"></span>${n}${datum}</div>`;
+    }).join('');
+    return `<div class="vg-team-card">
+      <div class="vg-team-hdr"><span class="vg-team-name">${team}</span><span class="vg-team-count">${done}/${members.length} — ${pctTeam}%</span></div>
+      <div class="vg-progress-bar"><div class="vg-progress-fill" style="width:${pctTeam}%"></div></div>
+      <div class="vg-names-grid">${names}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── LOGIN ──────────────────────────────────────────────────────────
+function checkLogin() {
+  const pwd = document.getElementById('loginPwd').value;
+  if(pwd === 'F@boryMT26!') {
+    sessionStorage.setItem('fab_auth','1');
+    document.getElementById('loginOverlay').classList.add('hide');
+    setTimeout(()=>{ document.getElementById('loginOverlay').style.display='none'; loadData(); load360FromN8N(); }, 450);
+  } else {
+    document.getElementById('loginError').textContent = 'Onjuist wachtwoord. Probeer opnieuw.';
+    const box = document.getElementById('loginBox');
+    box.classList.remove('shake');
+    void box.offsetWidth;
+    box.classList.add('shake');
+    document.getElementById('loginPwd').value='';
+  }
+}
+
+// ── INIT ───────────────────────────────────────────────────────────
+if(sessionStorage.getItem('fab_auth')==='1') {
+  document.getElementById('loginOverlay').style.display='none';
+  loadData();
+  load360FromN8N();
+} else {
+  setTimeout(()=>document.getElementById('loginPwd').focus(), 100);
+}
+
+</script>
